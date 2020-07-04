@@ -24,9 +24,15 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resolution := 9
 
-	result := fmt.Sprintf("%#x", h3.FromGeo(geo, resolution))
+	h3Index := h3.FromGeo(geo, resolution)
+	result := fmt.Sprintf("%#x", h3Index)
 	// Output:
 	// 0x8928308280fffff
+
+	neighbors := h3.KRing(h3Index, 1)
+	for _, n := range neighbors {
+		fmt.Printf("%#x\n", n)
+	}
 
 	w.Write([]byte(result))
 }
