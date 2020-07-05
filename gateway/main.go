@@ -1,12 +1,73 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"traffic-dispatcher/dbproxy"
+	"traffic-dispatcher/model"
 
 	h3 "github.com/uber/h3-go/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+func testInsert(h3Index string, lat float64, lon float64) {
+	dbCli := dbproxy.MongoConn()
+	// 指定获取要操作的数据集
+	collection := dbCli.Database("driverInfo").Collection("geoInfo")
+
+	d1 := model.Driver{
+		Name:    "test1",
+		UID:     "123456",
+		H3Index: h3Index,
+		GeoType: "Point",
+		Coord:   []float64{lat, lon},
+		GeoInfo: bson.M{
+			"type":        "Point",
+			"coordinates": []float64{lat, lon},
+		},
+	}
+	// d1Json, err := json.Marshal(d1)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	insertResult, err := collection.InsertOne(context.TODO(), d1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
+}
+
+func testQuery(lat float64, lon float64) {
+	dbCli := dbproxy.MongoConn()
+	// 指定获取要操作的数据集
+	collection := dbCli.Database("driverInfo").Collection("geoInfo")
+
+	stages := mongo.Pipeline{}
+	getNearbyStage := bson.D{{"$geoNear", bson.M{
+		"near": bson.M{
+			"type":        "Point",
+			"coordinates": []float64{lat, lon},
+		},
+		"maxDistance":   1000,
+		"spherical":     true,
+		"distanceField": "distance",
+	}}}
+	stages = append(stages, getNearbyStage)
+
+	filterCursor, err := collection.Aggregate(context.TODO(), stages)
+	if err != nil {
+		log.Println(err)
+	}
+	for filterCursor.Next(context.TODO()) {
+		log.Println(filterCursor.Current)
+	}
+}
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -25,7 +86,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	resolution := 9
 
 	h3Index := h3.FromGeo(geo, resolution)
-	result := fmt.Sprintf("%#x", h3Index)
+	h3IndexStr := fmt.Sprintf("%#x", h3Index)
 	// Output:
 	// 0x8928308280fffff
 
@@ -34,7 +95,11 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%#x\n", n)
 	}
 
-	w.Write([]byte(result))
+	// test mongo
+	testInsert(h3IndexStr, lat, lon)
+	// testQuery(lat, lon)
+
+	w.Write([]byte(h3IndexStr))
 }
 
 func main() {
