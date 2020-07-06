@@ -23,11 +23,11 @@ func testInsert(h3Index string, lat float64, lon float64) {
 		Name:    "test1",
 		UID:     "123456",
 		H3Index: h3Index,
-		GeoType: "Point",
-		Coord:   []float64{lat, lon},
+		// GeoType: "Point",
+		// Coord:   []float64{lon, lat},
 		GeoInfo: bson.M{
 			"type":        "Point",
-			"coordinates": []float64{lat, lon},
+			"coordinates": []float64{lon, lat},
 		},
 	}
 	// d1Json, err := json.Marshal(d1)
@@ -49,15 +49,17 @@ func testQuery(lat float64, lon float64) {
 	collection := dbCli.Database("driverInfo").Collection("geoInfo")
 
 	stages := mongo.Pipeline{}
-	getNearbyStage := bson.D{{"$geoNear", bson.M{
-		"near": bson.M{
-			"type":        "Point",
-			"coordinates": []float64{lat, lon},
-		},
-		"maxDistance":   1000,
-		"spherical":     true,
-		"distanceField": "distance",
-	}}}
+	getNearbyStage := bson.D{
+		{"$geoNear", bson.M{
+			"near": bson.M{
+				"type":        "Point",
+				"coordinates": []float64{lon, lat},
+			},
+			"maxDistance":   100000,
+			"spherical":     true,
+			"distanceField": "distance",
+		}}}
+
 	stages = append(stages, getNearbyStage)
 
 	filterCursor, err := collection.Aggregate(context.TODO(), stages)
@@ -65,7 +67,12 @@ func testQuery(lat float64, lon float64) {
 		log.Println(err)
 	}
 	for filterCursor.Next(context.TODO()) {
-		log.Println(filterCursor.Current)
+		var elem model.Driver
+		err := filterCursor.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%+v\n", elem)
 	}
 }
 
@@ -95,9 +102,9 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%#x\n", n)
 	}
 
-	// test mongo
-	testInsert(h3IndexStr, lat, lon)
-	// testQuery(lat, lon)
+	// // test mongo
+	// testInsert(h3IndexStr, lat, lon)
+	testQuery(lat+0.1, lon+0.1)
 
 	w.Write([]byte(h3IndexStr))
 }
