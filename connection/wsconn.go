@@ -22,8 +22,8 @@ type WsConnection struct {
 
 // WsUpgrader : http升级websocket协议
 var WsUpgrader = websocket.Upgrader{
-	ReadBufferSize:  4096,
-	WriteBufferSize: 1024,
+	// ReadBufferSize:  4096,
+	// WriteBufferSize: 1024,
 	// CORS设置，允许跨域请求
 	CheckOrigin: func(r *http.Request) bool {
 		if r.Method != "GET" {
@@ -74,6 +74,8 @@ func (conn *WsConnection) Close() {
 func (conn *WsConnection) ReadMessage() (data []byte, err error) {
 	select {
 	case data = <-conn.inChan:
+		// log.Println(string(data))
+		// break
 	case <-conn.closeChan:
 		err = errors.New("Connection is closed")
 	}
@@ -100,6 +102,7 @@ func (conn *WsConnection) processRead() {
 		if _, data, err = conn.wsConnect.ReadMessage(); err != nil {
 			goto OnErr
 		}
+
 		//阻塞在这里，等待inChan有空闲位置
 		select {
 		case conn.inChan <- data:

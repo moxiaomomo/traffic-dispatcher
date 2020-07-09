@@ -19,6 +19,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type Location struct {
+	Lat float64 `json:lat`
+	Lon float64 `json:lon`
+}
+
 func testInsert(resolution int, lat float64, lon float64) {
 	dbCli := dbproxy.MongoConn()
 	// 指定获取要操作的数据集
@@ -173,8 +178,16 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		if data, err := conn.ReadMessage(); err != nil {
-			log.Println(string(data))
 			goto ERR
+		} else {
+			var loc Location
+			if err := json.Unmarshal(data, &loc); err == nil {
+				if drivers, err := testQuery(loc.Lat, loc.Lon); err == nil {
+					if resp, err := json.Marshal(drivers); err == nil {
+						conn.WriteMessage(resp)
+					}
+				}
+			}
 		}
 		// if err = conn.WriteMessage([]byte("ACK")); err != nil {
 		// 	goto ERR
@@ -182,6 +195,7 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 ERR:
+	log.Println("error...")
 	conn.Close()
 }
 
