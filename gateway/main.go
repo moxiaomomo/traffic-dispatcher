@@ -7,9 +7,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 	"traffic-dispatcher/dbproxy"
 	"traffic-dispatcher/model"
 
+	wsconn "traffic-dispatcher/connection"
+
+	"github.com/gorilla/websocket"
 	h3 "github.com/uber/h3-go/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -140,9 +144,51 @@ func testQueryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(res))
 }
 
+func testWSHandler(w http.ResponseWriter, r *http.Request) {
+	var (
+		wsConn *websocket.Conn
+		err    error
+		conn   *wsconn.WsConnection
+	)
+
+	// upgrade websocket
+	if wsConn, err = wsconn.WsUpgrader.Upgrade(w, r, nil); err != nil {
+		return
+	}
+	// initiate connection
+	if conn, err = wsconn.InitConnection(wsConn); err != nil {
+		goto ERR
+	}
+
+	// 启动协程，持续发信息
+	go func() {
+		var err error
+		for {
+			if err = conn.WriteMessage([]byte(`{"code":0}`)); err != nil {
+				return
+			}
+			time.Sleep(3 * time.Second)
+		}
+	}()
+
+	for {
+		if data, err := conn.ReadMessage(); err != nil {
+			log.Println(string(data))
+			goto ERR
+		}
+		// if err = conn.WriteMessage([]byte("ACK")); err != nil {
+		// 	goto ERR
+		// }
+	}
+
+ERR:
+	conn.Close()
+}
+
 func main() {
 	http.HandleFunc("/test/insert", testInsertHandler)
 	http.HandleFunc("/test/query", testQueryHandler)
+	http.HandleFunc("/ws", testWSHandler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println(err.Error())
