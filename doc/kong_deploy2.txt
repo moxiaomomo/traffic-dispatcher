@@ -1,0 +1,48 @@
+docker network create kong-net
+
+docker run -d --name kong-database \
+--network=kong-net \
+-p 5432:5432 \
+-e "POSTGRES_USER=mykong" \
+-e "POSTGRES_DB=mykong" \
+-e "POSTGRES_PASSWORD=mykong" \
+postgres:9.6
+
+docker run --rm \
+--network=kong-net \
+-e "KONG_DATABASE=postgres" \
+-e "KONG_PG_HOST=kong-database" \
+-e "KONG_PG_USER=mykong" \
+-e "KONG_PG_PASSWORD=mykong" \
+-e "KONG_PG_DATABASE=mykong" \
+kong:2.0.1 kong migrations bootstrap
+
+docker run -d --name kong  \
+--network=kong-net \
+-e "KONG_DATABASE=postgres" \
+-e "KONG_PG_HOST=kong-database" \
+-e "KONG_PG_USER=mykong" \
+-e "KONG_PG_PASSWORD=mykong" \
+-e "KONG_PG_DATABASE=mykong" \
+-e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
+-e "KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444" \
+-e "KONG_PROXY_ACCESS_LOG=/usr/local/kong/logs/proxy_access.log"     \
+-e "KONG_ADMIN_ACCESS_LOG=/usr/local/kong/logs/admin_access.log"     \
+-e "KONG_PROXY_ERROR_LOG=/usr/local/kong/logs/proxy_error.log"     \
+-e "KONG_ADMIN_ERROR_LOG=/usr/local/kong/logs/admin_error.log" \
+-e "KONG_TRUSTED_IPS=0.0.0.0/0,::/0"     \
+-e "KONG_REAL_IP_HEADER=X-Forwarded-For" \
+-p 80:8000 \
+-p 443:8443 \
+-p 8001:8001 \
+-p 8444:8444 \
+kong:2.0.1
+
+docker run --rm pantsel/konga:latest -c prepare -a postgres -u postgresql://mykong:mykong@192.168.2.244:5432/konga
+docker run -d -p 1337:1337 \
+        --network kong-net \
+        --name konga \
+        -e "NODE_ENV=production"  \
+        -e "DB_ADAPTER=postgres" \
+        -e "DB_URI=postgresql://mykong:mykong@192.168.2.244:5432/konga" \
+        pantsel/konga

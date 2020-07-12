@@ -89,6 +89,11 @@ func testQuery(lat float64, lon float64) (res []model.Driver, err error) {
 	return
 }
 
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	res := fmt.Sprintf(`{"code":0}`)
+	w.Write([]byte(res))
+}
+
 func testInsertHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
@@ -200,6 +205,7 @@ ERR:
 }
 
 func main() {
+	http.HandleFunc("/hello", helloHandler)
 	http.HandleFunc("/test/insert", testInsertHandler)
 	http.HandleFunc("/test/query", testQueryHandler)
 	http.HandleFunc("/ws", testWSHandler)
