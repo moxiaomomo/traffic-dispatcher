@@ -17,3 +17,9 @@ docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380
 root@xiaomo:/home/xiaomo# curl -L http://192.168.2.244:2379/v2/members
 {"members":[{"id":"8d82831b0940236c","name":"etcd0","peerURLs":["http://192.168.2.244:2380"],"clientURLs":["http://192.168.2.244:2379","http://192.168.2.244:4001"]}]}
 ```
+
+- docker 安装 etcdkeeper (webUI)
+
+```
+docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper
+```
