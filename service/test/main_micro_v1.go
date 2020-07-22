@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"traffic-dispatcher/proto/hello"
+	hello "traffic-dispatcher/proto/hello_v1"
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
