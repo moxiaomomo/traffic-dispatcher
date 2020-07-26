@@ -1,19 +1,18 @@
 package main
 
 import (
-	"lbs/handler"
-	"lbs/subscriber"
-
-	"github.com/micro/go-micro/v2"
 	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2"
+	"user/api/handler"
+	"user/api/subscriber"
 
-	"traffic-dispatcher/proto/lbs"
+	api "user/api/proto/api"
 )
 
 func main() {
 	// New Service
 	service := micro.NewService(
-		micro.Name("go.micro.service.lbs"),
+		micro.Name("go.micro.service.api"),
 		micro.Version("latest"),
 	)
 
@@ -21,10 +20,10 @@ func main() {
 	service.Init()
 
 	// Register Handler
-	lbs.RegisterLbsHandler(service.Server(), new(handler.Lbs))
+	api.RegisterApiHandler(service.Server(), new(handler.Api))
 
 	// Register Struct as Subscriber
-	micro.RegisterSubscriber("go.micro.service.lbs", service.Server(), new(subscriber.Lbs))
+	micro.RegisterSubscriber("go.micro.service.api", service.Server(), new(subscriber.Api))
 
 	// Run service
 	if err := service.Run(); err != nil {

@@ -62,6 +62,8 @@ docker run -d --name kong  \
 -p 8444:8444 \
 kong:2.0.1
 
+# konga webUI
+# user/pwd: xiaomo/_m*_g*  moxiaomomo/mo...
 docker run --rm pantsel/konga:latest -c prepare -a postgres -u postgresql://mykong:mykong@192.168.2.244:5432/konga
 docker run -d -p 1337:1337 \
         --network kong-net \
@@ -70,3 +72,4 @@ docker run -d -p 1337:1337 \
         -e "DB_ADAPTER=postgres" \
         -e "DB_URI=postgresql://mykong:mykong@192.168.2.244:5432/konga" \
         pantsel/konga
+

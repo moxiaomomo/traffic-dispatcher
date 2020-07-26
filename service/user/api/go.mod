@@ -1,4 +1,4 @@
-module admin
+module user/api
 
 go 1.13
 

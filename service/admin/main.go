@@ -1,30 +1,33 @@
 package main
 
 import (
-    "context"
-    "fmt"
-    proto "traffic-dispatcher/service/admin/proto"
+	log "github.com/micro/go-micro/v2/logger"
 
-    "github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2"
+	"admin/handler"
+	"admin/client"
+
+	admin "admin/proto/admin"
 )
 
-type LBSSrv struct{}
-
-func (g *LBSSrv) DriverLocations(ctx context.Context, req *proto.Request, rsp *proto.Response) error {
-    rsp.Msg = "Name: " + req.Name // 对客户端传递的字符串做处理
-    return nil
-}
-
 func main() {
-    // 创建服务器
-    service := micro.NewService(
-        micro.Name("lbssrv"),
-    )
-    service.Init()
-    // 注册 handler
-    proto.RegisterLBSSrvHandler(service.Server(), new(LBSSrv))
+	// New Service
+	service := micro.NewService(
+		micro.Name("go.micro.api.admin"),
+		micro.Version("latest"),
+	)
 
-    if err := service.Run(); err != nil {
-        fmt.Println(err.Error())
-    }
+	// Initialise service
+	service.Init(
+		// create wrap for the Admin service client
+		micro.WrapHandler(client.AdminWrapper(service)),
+	)
+
+	// Register Handler
+	admin.RegisterAdminHandler(service.Server(), new(handler.Admin))
+
+	// Run service
+	if err := service.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

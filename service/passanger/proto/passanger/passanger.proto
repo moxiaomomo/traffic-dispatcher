@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+// package go.micro.api.passanger;
+option go_package="proto/passanger";
+
+import "proto/imports/api.proto";
+
+service Passanger {
+	rpc Call(go.api.Request) returns (go.api.Response) {}
+	rpc GetLocation(go.api.Request) returns (go.api.Response) {}
+}
