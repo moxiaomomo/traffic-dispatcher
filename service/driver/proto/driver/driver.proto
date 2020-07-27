@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+// package go.micro.api.driver;
+option go_package="proto/driver";
+
+import "proto/imports/api.proto";
+
+service Driver {
+	rpc Call(go.api.Request) returns (go.api.Response) {}
+}
