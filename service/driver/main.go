@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/micro/go-micro/v2/broker"
 	log "github.com/micro/go-micro/v2/logger"
+	_ "github.com/micro/go-plugins/broker/rabbitmq/v2"
 
 	"driver/client"
 	"driver/handler"
@@ -35,7 +36,7 @@ func main() {
 	if err := broker.Connect(); err != nil {
 		log.Fatalf("broker.Connect() error:%v\n", err)
 	}
-	go notification.Subscribe("test.topic")
+	go notification.Subscribe("lbs.dispatcher.task")
 
 	// Run service
 	if err := service.Run(); err != nil {

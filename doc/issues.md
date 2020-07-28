@@ -36,3 +36,20 @@ client/passanger.go:6:2: module traffic-dispatcher/proto/lbs@latest found (v0.0.
 // https://www.cnblogs.com/t0000/p/13354257.html
 // 参考 test/test_pkg的示例代码
 ```
+
+- broker 使用 rabbitmq 问题
+
+```
+Broker rabbitmq not found
+// 没有导入rabbitmq插件, 需要这样：
+// package main
+// import (
+	_ "github.com/micro/go-plugins/broker/rabbitmq/v2"
+    // ...
+// )
+
+
+2020-07-28 23:12:19  file=notification/publisher.go:31 level=info [pub] Message publication failed: service not found
+
+// 似乎是由于没有首先启动一次subscriber方的程序。。。
+```

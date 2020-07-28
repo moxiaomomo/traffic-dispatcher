@@ -25,8 +25,7 @@ func Publish(topic string) {
 			},
 			Body: []byte(fmt.Sprintf("%d:%s", i, time.Now().String())),
 		}
-		// 打印 broker
-		log.Info(broker.String())
+
 		// 发布消息
 		if err := broker.Publish(topic, msg); err != nil {
 			log.Infof("[pub] Message publication failed: %+v\n", err)
