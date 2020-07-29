@@ -1,0 +1,93 @@
+- **基础入门**
+  - 基础结构与类型
+  - 数组与切片
+  - map 与 set
+  - function 函数
+  - struct 和 method
+  - interface 接口
+  - relfect 反射
+  - goroutine
+  - channel
+  - `常用包用法`
+    - 字符串处理
+    - 文件 IO
+    - 网络 IO
+    - 时间日期
+    - 正则匹配
+    - JSON 解析
+    - 锁 mutex 和 sync
+    - sql/database
+- **工具环境**
+  - `编辑器/IDE`
+    - VSCode
+    - Goland
+    - SublimeText
+    - Vim
+  - `包管理`
+    - go get
+    - go vendor
+    - go module
+  - `代码辅助工具`
+    - gofmt
+    - golint
+    - govet
+    - goimports
+    - gometalinter
+    - godegraph
+  - `代码发布`
+    - 项目结构
+    - branch 和 tag
+    - godoc
+    - gochecklist
+- **编程进阶**
+  - Go 程序启动过程
+  - 内存布局与管理
+  - GPM 模型
+  - `编译优化`
+    - 逃逸分析
+    - string 和[]byte
+    - 函数内联
+  - 指针陷阱
+  - GC 垃圾回收
+  - 深入理解反射
+  - 交叉编译
+  - CGO
+  - `测试`
+    - 单元测试
+    - 压力测试
+    - 性能测试
+- **框架使用**
+  - `Web 框架`
+    - Gin
+    - Beego
+    - Martini
+  - `微服务框架`
+    - go-kit
+    - go-micro
+  - `rpc 通讯`
+    - gRPC
+    - protobuf
+- **项目开发**
+  - `云计算`
+    - `容器`
+      - docker
+      - moby 分支
+    - `容器编排`
+      - docker swarm
+      - k8s
+    - `服务注册与发现`
+      - consul
+      - etcd
+  - `DevOps`
+    - `Monitor`
+      - prometheus
+    - `Dev`
+      - rancher
+  - `存储引擎`
+    - etcd
+    - influxdb
+    - tidb
+    - cayley
+  - `API 网关`
+    - micro API
+    - Kong
