@@ -17,6 +17,8 @@ import (
 	h3 "github.com/uber/h3-go/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/micro/go-micro/v2/web"
 )
 
 type Location struct {
@@ -159,7 +161,21 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 		wsConn *websocket.Conn
 		err    error
 		conn   *wsconn.WsConnection
+		// 搜索范围的中心位置坐标
+		loc Location
 	)
+
+	// 搜索附近坐标位置
+	var processSearchLoc = func() {
+		if loc == (Location{}) || conn == nil {
+			return
+		}
+		if drivers, err := testQuery(loc.Lat, loc.Lon); err == nil {
+			if resp, err := json.Marshal(drivers); err == nil {
+				conn.WriteMessage(resp)
+			}
+		}
+	}
 
 	// upgrade websocket
 	if wsConn, err = wsconn.WsUpgrader.Upgrade(w, r, nil); err != nil {
@@ -167,31 +183,25 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// initiate connection
 	if conn, err = wsconn.InitConnection(wsConn); err != nil {
+		log.Println(err.Error())
 		goto ERR
 	}
 
 	// 启动协程，持续发信息
 	go func() {
-		var err error
 		for {
-			if err = conn.WriteMessage([]byte(`{"code":0}`)); err != nil {
-				return
-			}
+			processSearchLoc()
 			time.Sleep(3 * time.Second)
 		}
 	}()
 
 	for {
 		if data, err := conn.ReadMessage(); err != nil {
+			log.Println(err.Error())
 			goto ERR
 		} else {
-			var loc Location
 			if err := json.Unmarshal(data, &loc); err == nil {
-				if drivers, err := testQuery(loc.Lat, loc.Lon); err == nil {
-					if resp, err := json.Marshal(drivers); err == nil {
-						conn.WriteMessage(resp)
-					}
-				}
+				processSearchLoc()
 			}
 		}
 		// if err = conn.WriteMessage([]byte("ACK")); err != nil {
@@ -200,17 +210,23 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 ERR:
-	log.Println("error...")
 	conn.Close()
 }
 
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-	http.HandleFunc("/test/insert", testInsertHandler)
-	http.HandleFunc("/test/query", testQueryHandler)
-	http.HandleFunc("/ws", testWSHandler)
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		fmt.Println(err.Error())
+	service := web.NewService(
+		web.Name("go.micro.web.websocket"),
+		web.Address(":8082"),
+	)
+	if err := service.Init(); err != nil {
+		log.Fatal("Init", err)
+	}
+
+	service.HandleFunc("/hello", helloHandler)
+	service.HandleFunc("/test/insert", testInsertHandler)
+	service.HandleFunc("/test/query", testQueryHandler)
+	service.HandleFunc("/ws/lbs", testWSHandler)
+	if err := service.Run(); err != nil {
+		log.Fatal("Run: ", err)
 	}
 }
