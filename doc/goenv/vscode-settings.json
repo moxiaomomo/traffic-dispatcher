@@ -1,0 +1,26 @@
+{
+    "files.eol": "\n", // formatting only supports LF line endings
+    "go.goroot": "/usr/local/go",
+    "go.gopath": "/data/go",
+    "editor.fontSize": 16,
+    "prettier.jsxSingleQuote": true,
+    "editor.formatOnSave": true,
+    "markdown-pdf.executablePath": "/usr/bin/google-chrome",
+    "javascript.preferences.quoteStyle": "single",
+    "typescript.preferences.quoteStyle": "single",
+    "prettier.singleQuote": true,
+    "go.docsTool": "gogetdoc",
+    "go.formatTool": "goimports",
+    "go.autocompleteUnimportedPackages": true,
+    "go.useCodeSnippetsOnFunctionSuggest": true,
+    "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+}
+
+// https://www.jianshu.com/p/9b7844e6fda2
+// https://www.freesion.com/article/2570917148/
+
+// 插件配置: 使用gogetdoc和goimports
+
+// Use language server: false
+
+// Crtl_shift_P: go Install/Update Tools -> 选择安装所有包

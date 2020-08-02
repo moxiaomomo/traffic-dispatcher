@@ -21,11 +21,6 @@ import (
 	"github.com/micro/go-micro/v2/web"
 )
 
-type Location struct {
-	Lat float64 `json:lat`
-	Lon float64 `json:lon`
-}
-
 func testInsert(resolution int, lat float64, lon float64) {
 	dbCli := dbproxy.MongoConn()
 	// 指定获取要操作的数据集
@@ -162,15 +157,15 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 		err    error
 		conn   *wsconn.WsConnection
 		// 搜索范围的中心位置坐标
-		loc Location
+		loc model.GeoLocation
 	)
 
 	// 搜索附近坐标位置
 	var processSearchLoc = func() {
-		if loc == (Location{}) || conn == nil {
+		if loc == (model.GeoLocation{}) || conn == nil {
 			return
 		}
-		if drivers, err := testQuery(loc.Lat, loc.Lon); err == nil {
+		if drivers, err := testQuery(loc.Lat, loc.Lng); err == nil {
 			if resp, err := json.Marshal(drivers); err == nil {
 				conn.WriteMessage(resp)
 			}
