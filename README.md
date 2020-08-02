@@ -6,6 +6,26 @@
 
 ![archi_0.2.png](http://47.107.169.20/archi_0.2.png)
 
+### 环境要求及相关配置
+
+(后端服务)
+
+- Go: 支持 1.14 或以上
+- Go 包管理: Go Modules
+- Redis
+- MongoDB
+- MySQL
+- Etcd
+- RabbitMQ (Optional)
+- Protobuf (V3)
+- Docker (部署微服务等)
+
+(前端测试) [web_admin](https://github.com/moxiaomomo/traffic-dispatcher-admin)
+
+- Vue 2.x
+- Baidu map API
+- Typescript 3.x
+
 ### 微服务划分
 
 - admin 后台管理调度 (默认端口: 18080)
