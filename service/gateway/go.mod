@@ -3,13 +3,13 @@ module gateway
 go 1.14
 
 require (
-	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/micro/go-micro/v2 v2.9.1 // indirect
-	github.com/uber/h3-go/v3 v3.0.2 // indirect
-	go.mongodb.org/mongo-driver v1.4.0 // indirect
-	traffic-dispatcher/connection v0.0.0-00010101000000-000000000000 // indirect
-	traffic-dispatcher/dbproxy v0.0.0-00010101000000-000000000000 // indirect
-	traffic-dispatcher/model v0.0.0-00010101000000-000000000000 // indirect
+	github.com/gorilla/websocket v1.4.2
+	github.com/micro/go-micro/v2 v2.9.1
+	github.com/uber/h3-go/v3 v3.0.2
+	go.mongodb.org/mongo-driver v1.4.0
+	traffic-dispatcher/connection v0.0.0-00010101000000-000000000000
+	traffic-dispatcher/dbproxy v0.0.0-00010101000000-000000000000
+	traffic-dispatcher/model v0.0.0-00010101000000-000000000000
 )
 
 replace traffic-dispatcher/connection => ../../connection
