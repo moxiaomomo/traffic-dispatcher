@@ -11,6 +11,8 @@ https://github.com/adjust/go-wrk
 ```shell
 git clone git://github.com/adeven/go-wrk.git
 cd go-wrk
+# 开启go modules的情况， 需要初始化配置
+go mod init go-wrk
 go build
 ```
 
