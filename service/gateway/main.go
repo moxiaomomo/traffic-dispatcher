@@ -21,14 +21,14 @@ import (
 	"github.com/micro/go-micro/v2/web"
 )
 
-func testInsert(resolution int, lat float64, lon float64) {
+func testInsert(resolution int, lat float64, lng float64) {
 	dbCli := dbproxy.MongoConn()
 	// 指定获取要操作的数据集
 	collection := dbCli.Database("driverInfo").Collection("geoInfo")
 
 	geo := h3.GeoCoord{
 		Latitude:  lat,
-		Longitude: lon,
+		Longitude: lng,
 	}
 	h3Index := h3.FromGeo(geo, resolution)
 	h3IndexStr := fmt.Sprintf("%#x", h3Index)
@@ -39,7 +39,7 @@ func testInsert(resolution int, lat float64, lon float64) {
 		H3Index: h3IndexStr,
 		GeoInfo: bson.M{
 			"type":        "Point",
-			"coordinates": []float64{lon, lat},
+			"coordinates": []float64{lng, lat},
 		},
 	}
 
@@ -51,7 +51,7 @@ func testInsert(resolution int, lat float64, lon float64) {
 	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 }
 
-func testQuery(lat float64, lon float64) (res []model.Driver, err error) {
+func testQuery(lat float64, lng float64) (res []model.Driver, err error) {
 	dbCli := dbproxy.MongoConn()
 	// 指定获取要操作的数据集
 	collection := dbCli.Database("driverInfo").Collection("geoInfo")
@@ -61,7 +61,7 @@ func testQuery(lat float64, lon float64) (res []model.Driver, err error) {
 		{"$geoNear", bson.M{
 			"near": bson.M{
 				"type":        "Point",
-				"coordinates": []float64{lon, lat},
+				"coordinates": []float64{lng, lat},
 			},
 			"maxDistance":   100000,
 			"spherical":     true,
@@ -95,7 +95,7 @@ func testInsertHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	lat, err1 := strconv.ParseFloat(r.Form.Get("lat"), 64)
-	lon, err2 := strconv.ParseFloat(r.Form.Get("lon"), 64)
+	lng, err2 := strconv.ParseFloat(r.Form.Get("lng"), 64)
 	if err1 != nil || err2 != nil {
 		w.Write([]byte("FAILED"))
 		return
@@ -105,10 +105,10 @@ func testInsertHandler(w http.ResponseWriter, r *http.Request) {
 
 	for i := 1.0; i <= 10.0; i++ {
 		var delta = 0.01 * i
-		testInsert(resolution, lat+delta, lon+delta)
-		testInsert(resolution, lat+delta, lon-delta)
-		testInsert(resolution, lat-delta, lon+delta)
-		testInsert(resolution, lat-delta, lon-delta)
+		testInsert(resolution, lat+delta, lng+delta)
+		testInsert(resolution, lat+delta, lng-delta)
+		testInsert(resolution, lat-delta, lng+delta)
+		testInsert(resolution, lat-delta, lng-delta)
 	}
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -121,7 +121,7 @@ func testQueryHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	lat, err1 := strconv.ParseFloat(r.Form.Get("lat"), 64)
-	lon, err2 := strconv.ParseFloat(r.Form.Get("lon"), 64)
+	lng, err2 := strconv.ParseFloat(r.Form.Get("lng"), 64)
 	if err1 != nil || err2 != nil {
 		w.Write([]byte("FAILED"))
 		return
@@ -133,7 +133,7 @@ func testQueryHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// 经度0.1度约10km, 纬度0.1度约11.1km
-	drivers, err := testQuery(lat+0.1, lon+0.1)
+	drivers, err := testQuery(lat+0.1, lng+0.1)
 	if err != nil {
 		res := fmt.Sprintf(`{"code":-1}`)
 		w.Write([]byte(res))
