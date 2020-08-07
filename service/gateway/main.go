@@ -21,6 +21,8 @@ import (
 	"github.com/micro/go-micro/v2/web"
 )
 
+var wsConnCount int
+
 func testInsert(resolution int, lat float64, lng float64) {
 	dbCli := dbproxy.MongoConn()
 	// 指定获取要操作的数据集
@@ -182,6 +184,9 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 		goto ERR
 	}
 
+	wsConnCount++
+	log.Printf("Current connection count: %d\n", wsConnCount)
+
 	// 启动协程，持续发信息
 	go func() {
 		for {
@@ -206,6 +211,7 @@ func testWSHandler(w http.ResponseWriter, r *http.Request) {
 
 ERR:
 	conn.Close()
+	wsConnCount--
 }
 
 func main() {

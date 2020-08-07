@@ -26,16 +26,9 @@ var (
 	wsAddr = flag.String("addr", "localhost:8082", "http service address")
 )
 
-func main() {
-	flag.Parse()
-	log.SetFlags(0)
-
-	interrupt := make(chan os.Signal, 1)
-	// 监听和捕获信号量
-	signal.Notify(interrupt, os.Interrupt)
-
+func oneClient(interrupt chan os.Signal, point model.GeoLocation, idx int) {
 	u := url.URL{Scheme: "ws", Host: *wsAddr, Path: "/ws/lbs"}
-	log.Printf("Try to connect to server %s\n", u.String())
+	log.Printf("Client [%d] try to connect to server %s\n", idx, u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
@@ -53,7 +46,7 @@ func main() {
 				log.Printf("Read message err:%s\n", err.Error())
 				return
 			}
-			log.Printf("Recevice message: %s\n", message)
+			log.Printf("Client [%d] Recevice message: %s\n", idx, message)
 		}
 	}()
 
@@ -66,7 +59,7 @@ func main() {
 		case <-done:
 			return
 		case <-ticker.C:
-			if msg, err := json.Marshal(centerPoint); err == nil {
+			if msg, err := json.Marshal(point); err == nil {
 				err := c.WriteMessage(websocket.TextMessage, msg)
 				if err != nil {
 					log.Printf("Write message err: %s\n", err.Error())
@@ -88,6 +81,29 @@ func main() {
 			case <-done:
 			case <-time.After(time.Second):
 			}
+			return
+		}
+	}
+}
+
+func main() {
+	flag.Parse()
+	log.SetFlags(0)
+
+	interrupt := make(chan os.Signal, 1)
+	// 监听和捕获信号量
+	signal.Notify(interrupt, os.Interrupt)
+
+	for i := 0; i < 10; i++ {
+		go oneClient(interrupt, model.GeoLocation{
+			Lat: centerPoint.Lat + float64(i),
+			Lng: centerPoint.Lng + float64(i),
+		}, i)
+	}
+
+	for {
+		select {
+		case <-interrupt:
 			return
 		}
 	}

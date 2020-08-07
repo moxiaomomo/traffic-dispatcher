@@ -1,5 +1,7 @@
 ### http 接口压力测试示例
 
+`go-wrk`是一个用 Go 语言实现的轻量级的 http 基准测试工具，类似于`wrk`，本文将简单介绍一下如何使用`go-wrk`实现接口的性能(压力)测试。
+
 - 安装 go-wrk
 
 ```
@@ -11,7 +13,7 @@ https://github.com/adjust/go-wrk
 ```shell
 git clone git://github.com/adeven/go-wrk.git
 cd go-wrk
-# 开启go modules的情况， 需要初始化配置
+# 开启go modules的情况， 需要初始化配置(go1.11或以上)
 go mod init go-wrk
 go build
 ```
@@ -54,7 +56,7 @@ Usage of ./go-wrk:
     	the numbers of threads used (default 1)
 ```
 
-- 测试`/test/qurey`接口
+- 测试`/test/qurey`接口 (假设提前开启了一个 web 服务，监听了 8082 端口)
 
 ```shell
 # 8个线程，400个连接， 模拟10w次请求
