@@ -35,3 +35,10 @@
 - lbs 地理位置服务 (默认端口： 18003)
 - dispatcher 派遣调度服务 (默认端口：18004)
 - notification 全局消息服务 (默认端口：18005)
+
+### 编译
+
+```shell
+# in development
+./build-all.sh
+```
