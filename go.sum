@@ -351,6 +351,9 @@ github.com/micro/go-micro v1.18.0/go.mod h1:klwUJL1gkdY1MHFyz+fFJXn52dKcty4hoe95
 github.com/micro/go-micro/v2 v2.9.1 h1:+S9koIrNWARjpP6k2TZ7kt0uC9zUJtNXzIdZTZRms7Q=
 github.com/micro/go-micro/v2 v2.9.1/go.mod h1:x55ZM3Puy0FyvvkR3e0ha0xsE9DFwfPSUMWAIbFY0SY=
 github.com/micro/go-plugins v1.5.1 h1:swcFD7ynCTUo98APqIEIbPu2XMd6yVGTnI8PqdnCwOQ=
+github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd h1:8Pjj+kTCbzFIIw8ZeCJsbtxOPd+jMsCcOSeU1xPgvoY=
+github.com/micro/go-plugins/broker/rabbitmq/v2 v2.9.1 h1:JwumSuq0a6IZ9Ea/Pq8cgy2wsCeqmDThZvMINHMZpFs=
+github.com/micro/go-plugins/broker/rabbitmq/v2 v2.9.1/go.mod h1:HVSLIB7iIe7mw/yvzg65F+2qV57mkcMpWeTo0jdtZFA=
 github.com/micro/go-plugins/registry/etcdv3 v0.0.0-20200119172437-4fe21aa238fd h1:oTqvYym0IwWVtewAECorh11cgymZb9AFR7xfdI93waQ=
 github.com/micro/go-plugins/registry/etcdv3 v0.0.0-20200119172437-4fe21aa238fd/go.mod h1:GMrkmYoxDWgof79v3A7ipnRxQaMybZ0WJrVJxpXA7Jo=
 github.com/micro/go-plugins/registry/etcdv3/v2 v2.9.1 h1:5o2rfcmObTiu1ixEpdIw7Wn2qObvBO8MU9YpSY3dJR0=
@@ -493,6 +496,8 @@ github.com/spf13/jwalterweatherman v1.0.0/go.mod h1:cQK4TGJAtQXfYWX+Ddv3mKDzgVb6
 github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
 github.com/spf13/viper v1.6.3/go.mod h1:jUMtyi0/lB5yZH/FjyGAoH7IMNrIhlBf6pXZmbMDvzw=
 github.com/src-d/gcfg v1.4.0/go.mod h1:p/UMsR43ujA89BJY9duynAwIpvqEujIH/jFlfL7jWoI=
+github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71 h1:2MR0pKUzlP3SGgj5NYJe/zRYDwOu9ku6YHy+Iw7l5DM=
+github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

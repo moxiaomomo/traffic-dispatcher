@@ -59,7 +59,12 @@ func oneClient(interrupt chan os.Signal, point model.GeoLocation, idx int) {
 		case <-done:
 			return
 		case <-ticker.C:
-			if msg, err := json.Marshal(point); err == nil {
+			wsMsg := model.WSMessage{
+				Command: model.CmdReportGeo,
+				Role:    model.ClientDriver,
+				Geo:     point,
+			}
+			if msg, err := json.Marshal(wsMsg); err == nil {
 				err := c.WriteMessage(websocket.TextMessage, msg)
 				if err != nil {
 					log.Printf("Write message err: %s\n", err.Error())

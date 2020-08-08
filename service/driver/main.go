@@ -11,7 +11,7 @@ import (
 
 	"github.com/micro/go-micro/v2"
 
-	driver "driver/proto/driver"
+	driver "traffic-dispatcher/proto/driver"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	)
 
 	// Register Handler
-	driver.RegisterDriverHandler(service.Server(), new(handler.Driver))
+	driver.RegisterGreeterHandler(service.Server(), new(handler.Greeter))
 
 	if err := broker.Init(); err != nil {
 		log.Fatalf("broker.Init() error :%v\n", err)

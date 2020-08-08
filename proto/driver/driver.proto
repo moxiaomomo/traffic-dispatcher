@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// package proto;
+option go_package=".;driver";
+
+service Greeter {
+    rpc HelloTest (SayRequest) returns (SayResponse);
+}
+
+message  SayRequest{
+    string name = 1;
+}
+
+message SayResponse{
+    string greeting = 2;
+}

@@ -3,10 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	log "github.com/micro/go-micro/v2/logger"
 
 	"driver/client"
+	driver "traffic-dispatcher/proto/driver"
 	"traffic-dispatcher/proto/lbs"
 
 	api "github.com/micro/go-micro/v2/api/proto"
@@ -48,5 +50,14 @@ func (e *Driver) Call(ctx context.Context, req *api.Request, rsp *api.Response) 
 	rsp.StatusCode = 200
 	rsp.Body = string(b)
 
+	return nil
+}
+
+type Greeter struct {
+}
+
+func (g *Greeter) HelloTest(ctx context.Context, req *driver.SayRequest, resp *driver.SayResponse) error {
+	fmt.Println("recived data")
+	resp.Greeting = req.Name + "===="
 	return nil
 }

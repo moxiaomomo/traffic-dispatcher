@@ -35,3 +35,10 @@ protoc --version
 google.golang.org/grpc v1.26.0
 google.golang.org/protobuf v1.23.0
 ```
+
+- 编译 proto 示例
+
+```shell
+$ cd proto/driver
+$ protoc --proto_path=. --proto_path=. --micro_out=. --go_out=. driver.proto
+```
