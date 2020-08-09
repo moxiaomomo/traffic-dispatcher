@@ -11,8 +11,20 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/micro/go-plugins/broker/rabbitmq/v2 v2.9.1
+	github.com/uber/h3-go v3.0.1+incompatible
+	go.mongodb.org/mongo-driver v1.4.0
 	google.golang.org/protobuf v1.25.0
 	traffic-dispatcher/proto v0.0.0-00010101000000-000000000000
+	traffic-dispatcher/connection v0.0.0-00010101000000-000000000000
+	traffic-dispatcher/dbproxy v0.0.0-00010101000000-000000000000
+	traffic-dispatcher/model v0.0.0-00010101000000-000000000000
 )
 
 replace traffic-dispatcher/proto => ../../proto
+
+replace traffic-dispatcher/connection => ../../connection
+
+replace traffic-dispatcher/dbproxy => ../../dbproxy
+
+replace traffic-dispatcher/model => ../../model
+

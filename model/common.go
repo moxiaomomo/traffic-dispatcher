@@ -26,18 +26,26 @@ const (
 	ClientAdmin
 )
 
-// WSMessage websocket message
-type WSMessage struct {
-	Command WSMsgType   `json:"cmd"`
-	Role    ClientRole  `json:"role"`
-	Geo     GeoLocation `json:"geo"`
-	Data    []byte      `json:"data"`
-}
-
 // GeoLocation 经纬度位置
 type GeoLocation struct {
 	// Lat 纬度
 	Lat float64 `json:"lat"`
 	// Lng 经度
 	Lng float64 `json:"lng"`
+}
+
+// User 用户client
+type User struct {
+	Name  string `json:"name"`
+	UID   string `json:"uid"`
+	Token string `json:"token"`
+}
+
+// WSMessage websocket message
+type WSMessage struct {
+	Command WSMsgType   `json:"cmd"`
+	User    User        `json:"user"`
+	Role    ClientRole  `json:"role"`
+	Geo     GeoLocation `json:"geo"`
+	Data    []byte      `json:"data"`
 }

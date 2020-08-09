@@ -9,6 +9,7 @@ service Greeter {
 
 message  SayRequest{
     string name = 1;
+    bytes data = 2;
 }
 
 message SayResponse{

@@ -17,7 +17,7 @@ import (
 
 var wsConnCount int
 
-func reportGeoInfo() {
+func reportGeoInfo(data []byte) {
 	service := micro.NewService(
 		micro.Name("client.service"),
 	)
@@ -26,6 +26,7 @@ func reportGeoInfo() {
 	driverCli := driver.NewGreeterService("go.micro.api.driver", service.Client())
 	rsp, err := driverCli.HelloTest(context.TODO(), &driver.SayRequest{
 		Name: "Hello test",
+		Data: data,
 	})
 
 	if err != nil {
@@ -86,7 +87,7 @@ func WSConnHandler(w http.ResponseWriter, r *http.Request) {
 				if wsMsg.Command == model.CmdQueryGeo {
 					processSearchLoc()
 				} else if wsMsg.Command == model.CmdReportGeo {
-					reportGeoInfo()
+					reportGeoInfo(data)
 				}
 			}
 		}

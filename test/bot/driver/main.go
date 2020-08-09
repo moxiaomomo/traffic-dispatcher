@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -26,7 +27,7 @@ var (
 	wsAddr = flag.String("addr", "localhost:8082", "http service address")
 )
 
-func oneClient(interrupt chan os.Signal, point model.GeoLocation, idx int) {
+func oneClient(interrupt chan os.Signal, user model.User, point model.GeoLocation, idx int) {
 	u := url.URL{Scheme: "ws", Host: *wsAddr, Path: "/ws/lbs"}
 	log.Printf("Client [%d] try to connect to server %s\n", idx, u.String())
 
@@ -62,6 +63,7 @@ func oneClient(interrupt chan os.Signal, point model.GeoLocation, idx int) {
 			wsMsg := model.WSMessage{
 				Command: model.CmdReportGeo,
 				Role:    model.ClientDriver,
+				User:    user,
 				Geo:     point,
 			}
 			if msg, err := json.Marshal(wsMsg); err == nil {
@@ -99,11 +101,19 @@ func main() {
 	// 监听和捕获信号量
 	signal.Notify(interrupt, os.Interrupt)
 
-	for i := 0; i < 10; i++ {
-		go oneClient(interrupt, model.GeoLocation{
-			Lat: centerPoint.Lat + float64(i),
-			Lng: centerPoint.Lng + float64(i),
-		}, i)
+	for i := 0; i < 20; i++ {
+		go oneClient(
+			interrupt,
+			model.User{
+				Name:  fmt.Sprintf("testuser_%d", i),
+				UID:   fmt.Sprintf("testuid_%d", i),
+				Token: "To_Define",
+			},
+			model.GeoLocation{
+				Lat: centerPoint.Lat + float64(i),
+				Lng: centerPoint.Lng + float64(i),
+			},
+			i)
 	}
 
 	for {
