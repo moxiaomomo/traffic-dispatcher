@@ -33,33 +33,34 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
-// Api Endpoints for Greeter service
+// Api Endpoints for DriverSrv service
 
-func NewGreeterEndpoints() []*api.Endpoint {
+func NewDriverSrvEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{}
 }
 
-// Client API for Greeter service
+// Client API for DriverSrv service
 
-type GreeterService interface {
-	HelloTest(ctx context.Context, in *SayRequest, opts ...client.CallOption) (*SayResponse, error)
+type DriverSrvService interface {
+	ReportGeo(ctx context.Context, in *ReportRequest, opts ...client.CallOption) (*ReportResponse, error)
+	QueryGeo(ctx context.Context, in *QueryRequest, opts ...client.CallOption) (*QueryResponse, error)
 }
 
-type greeterService struct {
+type driverSrvService struct {
 	c    client.Client
 	name string
 }
 
-func NewGreeterService(name string, c client.Client) GreeterService {
-	return &greeterService{
+func NewDriverSrvService(name string, c client.Client) DriverSrvService {
+	return &driverSrvService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *greeterService) HelloTest(ctx context.Context, in *SayRequest, opts ...client.CallOption) (*SayResponse, error) {
-	req := c.c.NewRequest(c.name, "Greeter.HelloTest", in)
-	out := new(SayResponse)
+func (c *driverSrvService) ReportGeo(ctx context.Context, in *ReportRequest, opts ...client.CallOption) (*ReportResponse, error) {
+	req := c.c.NewRequest(c.name, "DriverSrv.ReportGeo", in)
+	out := new(ReportResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,27 +68,43 @@ func (c *greeterService) HelloTest(ctx context.Context, in *SayRequest, opts ...
 	return out, nil
 }
 
-// Server API for Greeter service
-
-type GreeterHandler interface {
-	HelloTest(context.Context, *SayRequest, *SayResponse) error
-}
-
-func RegisterGreeterHandler(s server.Server, hdlr GreeterHandler, opts ...server.HandlerOption) error {
-	type greeter interface {
-		HelloTest(ctx context.Context, in *SayRequest, out *SayResponse) error
+func (c *driverSrvService) QueryGeo(ctx context.Context, in *QueryRequest, opts ...client.CallOption) (*QueryResponse, error) {
+	req := c.c.NewRequest(c.name, "DriverSrv.QueryGeo", in)
+	out := new(QueryResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
 	}
-	type Greeter struct {
-		greeter
+	return out, nil
+}
+
+// Server API for DriverSrv service
+
+type DriverSrvHandler interface {
+	ReportGeo(context.Context, *ReportRequest, *ReportResponse) error
+	QueryGeo(context.Context, *QueryRequest, *QueryResponse) error
+}
+
+func RegisterDriverSrvHandler(s server.Server, hdlr DriverSrvHandler, opts ...server.HandlerOption) error {
+	type driverSrv interface {
+		ReportGeo(ctx context.Context, in *ReportRequest, out *ReportResponse) error
+		QueryGeo(ctx context.Context, in *QueryRequest, out *QueryResponse) error
 	}
-	h := &greeterHandler{hdlr}
-	return s.Handle(s.NewHandler(&Greeter{h}, opts...))
+	type DriverSrv struct {
+		driverSrv
+	}
+	h := &driverSrvHandler{hdlr}
+	return s.Handle(s.NewHandler(&DriverSrv{h}, opts...))
 }
 
-type greeterHandler struct {
-	GreeterHandler
+type driverSrvHandler struct {
+	DriverSrvHandler
 }
 
-func (h *greeterHandler) HelloTest(ctx context.Context, in *SayRequest, out *SayResponse) error {
-	return h.GreeterHandler.HelloTest(ctx, in, out)
+func (h *driverSrvHandler) ReportGeo(ctx context.Context, in *ReportRequest, out *ReportResponse) error {
+	return h.DriverSrvHandler.ReportGeo(ctx, in, out)
+}
+
+func (h *driverSrvHandler) QueryGeo(ctx context.Context, in *QueryRequest, out *QueryResponse) error {
+	return h.DriverSrvHandler.QueryGeo(ctx, in, out)
 }

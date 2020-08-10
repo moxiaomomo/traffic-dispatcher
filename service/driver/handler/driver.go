@@ -8,6 +8,7 @@ import (
 	log "github.com/micro/go-micro/v2/logger"
 	"github.com/uber/h3-go"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"driver/client"
@@ -66,7 +67,43 @@ func InsertGeo(resolution int, data model.WSMessage) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Inserted a single document: ", insertResult.UpsertedID)
+	log.Info("Inserted a single document: ", insertResult.UpsertedID)
+}
+
+func QueryGeo(lat float64, lng float64) (res []model.Driver, err error) {
+	dbCli := dbproxy.MongoConn()
+	// 指定获取要操作的数据集
+	collection := dbCli.Database("driverInfo").Collection("geoInfo")
+
+	stages := mongo.Pipeline{}
+	getNearbyStage := bson.D{
+		{"$geoNear", bson.M{
+			"near": bson.M{
+				"type":        "Point",
+				"coordinates": []float64{lng, lat},
+			},
+			"maxDistance":   100000,
+			"spherical":     true,
+			"distanceField": "distance",
+		}}}
+
+	stages = append(stages, getNearbyStage)
+
+	filterCursor, err := collection.Aggregate(context.TODO(), stages)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	for filterCursor.Next(context.TODO()) {
+		var elem model.Driver
+		err = filterCursor.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		res = append(res, elem)
+	}
+	return
 }
 
 // Driver.Call is called by the API as /driver/call with post body {"name": "foo"}
@@ -95,18 +132,29 @@ func (e *Driver) Call(ctx context.Context, req *api.Request, rsp *api.Response) 
 	return nil
 }
 
-type Greeter struct {
-}
-
-func (g *Greeter) HelloTest(ctx context.Context, req *driver.SayRequest, resp *driver.SayResponse) error {
-	// fmt.Println("recived data")
+func (g *Driver) ReportGeo(ctx context.Context, req *driver.ReportRequest, resp *driver.ReportResponse) error {
 	var data model.WSMessage
 	if err := json.Unmarshal(req.Data, &data); err == nil {
 		InsertGeo(7, data)
-		resp.Greeting = "Hi " + req.Name
+		resp.Msg = "Hi " + req.Name
 		return nil
 	} else {
-		resp.Greeting = "Oooops..." + req.Name
+		resp.Msg = "Oooops..." + req.Name
 		return err
 	}
+}
+
+func (g *Driver) QueryGeo(ctx context.Context, req *driver.QueryRequest, resp *driver.QueryResponse) error {
+	var data model.WSMessage
+	var err error
+	if err = json.Unmarshal(req.Data, &data); err == nil {
+		if geolist, err := QueryGeo(data.Geo.Lat, data.Geo.Lng); err == nil {
+			data, _ := json.Marshal(geolist)
+			resp.Msg = "Hi " + req.Name
+			resp.Data = data
+			return nil
+		}
+	}
+	resp.Msg = "Oooops..." + req.Name
+	return err
 }

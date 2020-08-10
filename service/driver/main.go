@@ -28,7 +28,7 @@ func main() {
 	)
 
 	// Register Handler
-	driver.RegisterGreeterHandler(service.Server(), new(handler.Greeter))
+	driver.RegisterDriverSrvHandler(service.Server(), new(handler.Driver))
 
 	if err := broker.Init(); err != nil {
 		log.Fatalf("broker.Init() error :%v\n", err)
