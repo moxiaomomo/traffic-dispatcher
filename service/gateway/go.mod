@@ -15,6 +15,8 @@ require (
 	traffic-dispatcher/proto v1.0.0
 )
 
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+
 replace traffic-dispatcher/connection => ../../connection
 
 replace traffic-dispatcher/dbproxy => ../../dbproxy

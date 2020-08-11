@@ -10,57 +10,79 @@ import (
 	wsconn "traffic-dispatcher/connection"
 	"traffic-dispatcher/model"
 	"traffic-dispatcher/proto/driver"
+	"traffic-dispatcher/proto/passenger"
 
 	"github.com/gorilla/websocket"
 	"github.com/micro/go-micro/v2"
 )
 
 var (
-	wsConn      *websocket.Conn
-	conn        *wsconn.WsConnection
-	wsConnCount int
-	driverCli   driver.DriverSrvService
+	wsConn       *websocket.Conn
+	conn         *wsconn.WsConnection
+	wsConnCount  int
+	driverCli    driver.DriverSrvService
+	passengerCli passenger.PassengerSrvService
 )
 
 func init() {
-	service := micro.NewService(
-		micro.Name("client.service"),
-	)
-	service.Init()
+	drvSvc := micro.NewService(micro.Name("driver.client"))
+	drvSvc.Init()
+	driverCli = driver.NewDriverSrvService("go.micro.api.driver", drvSvc.Client())
 
-	driverCli = driver.NewDriverSrvService("go.micro.api.driver", service.Client())
+	psgSvc := micro.NewService(micro.Name("passenger.client"))
+	psgSvc.Init()
+	passengerCli = passenger.NewPassengerSrvService("go.micro.api.passenger", psgSvc.Client())
 }
 
-func reportGeoInfo(data []byte) {
-	rsp, err := driverCli.ReportGeo(context.TODO(), &driver.ReportRequest{
-		Name: "ReportGeoInfo",
-		Data: data,
-	})
-
-	if err != nil {
-		log.Println(err)
+func reportGeoInfo(cliRole model.ClientRole, data []byte) {
+	switch cliRole {
+	case model.ClientDriver:
+		if rsp, err := driverCli.ReportGeo(context.TODO(), &driver.ReportRequest{
+			Name: "ReportGeoInfo",
+			Data: data,
+		}); err == nil {
+			log.Println(rsp.GetMsg())
+		} else {
+			log.Println(err)
+		}
+		break
+	case model.ClientPassenger:
+		if rsp, err := passengerCli.ReportGeo(context.TODO(), &passenger.ReportPassengerRequest{
+			Name: "ReportGeoInfo",
+			Data: data,
+		}); err == nil {
+			log.Println(rsp.GetMsg())
+		} else {
+			log.Println(err)
+		}
+		break
 	}
-	log.Println(rsp.GetMsg())
 }
 
 // 搜索附近坐标位置
-func queryGeoInfo(data []byte) {
-	rsp, err := driverCli.QueryGeo(context.TODO(), &driver.QueryRequest{
-		Name: "QueryGeoInfo",
-		Data: data,
-	})
-
-	if err != nil {
-		log.Println(err)
-		return
+func queryGeoInfo(cliRole model.ClientRole, data []byte) {
+	switch cliRole {
+	case model.ClientDriver:
+		if rsp, err := driverCli.QueryGeo(context.TODO(), &driver.QueryRequest{
+			Name: "QueryGeoInfo",
+			Data: data,
+		}); err == nil {
+			conn.WriteMessage(rsp.GetData())
+		} else {
+			log.Println(err)
+		}
+		break
+	case model.ClientPassenger:
+		if rsp, err := passengerCli.QueryGeo(context.TODO(), &passenger.QueryPassengerRequest{
+			Name: "QueryGeoInfo",
+			Data: data,
+		}); err == nil {
+			conn.WriteMessage(rsp.GetData())
+		} else {
+			log.Println(err)
+		}
+		break
 	}
-
-	// log.Println(rsp.GetData())
-	conn.WriteMessage(rsp.GetData())
-	// var geolist []model.Driver
-	// if err := json.Unmarshal(rsp.GetData(), geolist); err == nil {
-	// 	conn.WriteMessage(rsp.GetData())
-	// }
 }
 
 // WSConnHandler websocket handler
@@ -91,11 +113,11 @@ func WSConnHandler(w http.ResponseWriter, r *http.Request) {
 		for {
 			select {
 			case <-ticker.C:
-				log.Println(wsMsg)
-				if wsMsg.Geo == (model.GeoLocation{}) || conn == nil {
+				// log.Println(wsMsg)
+				if wsMsg.Geo == (model.GeoLocation{}) || conn.IsClose() {
 					// ...
 				} else {
-					queryGeoInfo(wsMsgByte)
+					queryGeoInfo(wsMsg.Role, wsMsgByte)
 				}
 			}
 		}
@@ -108,9 +130,9 @@ func WSConnHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if err := json.Unmarshal(wsMsgByte, &wsMsg); err == nil {
 				if wsMsg.Command == model.CmdQueryGeo {
-					queryGeoInfo(wsMsgByte)
+					queryGeoInfo(wsMsg.Role, wsMsgByte)
 				} else if wsMsg.Command == model.CmdReportGeo {
-					reportGeoInfo(wsMsgByte)
+					reportGeoInfo(wsMsg.Role, wsMsgByte)
 				}
 			}
 		}
@@ -118,5 +140,9 @@ func WSConnHandler(w http.ResponseWriter, r *http.Request) {
 
 ERR:
 	conn.Close()
+
+	wsMsg = model.WSMessage{}
+	wsMsgByte = nil
+
 	wsConnCount--
 }

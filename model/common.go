@@ -20,19 +20,11 @@ const (
 	ClientUnknown ClientRole = iota
 	// ClientDriver 司机角色
 	ClientDriver
-	// ClientPassanger 乘客角色
-	ClientPassanger
+	// ClientPassenger 乘客角色
+	ClientPassenger
 	// ClientAdmin 乘管理员角色
 	ClientAdmin
 )
-
-// GeoLocation 经纬度位置
-type GeoLocation struct {
-	// Lat 纬度
-	Lat float64 `json:"lat"`
-	// Lng 经度
-	Lng float64 `json:"lng"`
-}
 
 // User 用户client
 type User struct {

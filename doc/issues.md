@@ -21,17 +21,17 @@ micro --registry=etcd --registry_address=192.168.2.244:2379 (正常启动)
 - 导入本地包的问题
 
 ```
-xiaomo@xiaomo:/data/go/src/traffic-dispatcher/service/passanger$ make build
-protoc --proto_path=. --micro_out=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto:. --go_out=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto:. proto/passanger/passanger.proto
-go build -o passanger-api *.go
+xiaomo@xiaomo:/data/go/src/traffic-dispatcher/service/passenger$ make build
+protoc --proto_path=. --micro_out=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto:. --go_out=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto:. proto/passenger/passenger.proto
+go build -o passenger-api *.go
 ../lbs/main.go:6:2: package lbs/handler is not in GOROOT (/usr/local/go/src/lbs/handler)
-client/passanger.go:6:2: import "lbs/proto" is a program, not an importable package
+client/passenger.go:6:2: import "lbs/proto" is a program, not an importable package
 ../lbs/main.go:9:2: module lbs/proto@latest found (v0.0.0-00010101000000-000000000000, replaced by ../lbs), but does not contain package lbs/proto/lbs
 ../lbs/main.go:7:2: package lbs/subscriber is not in GOROOT (/usr/local/go/src/lbs/subscriber)
 make: *** [Makefile:14：build] 错误 1
 
 
-client/passanger.go:6:2: module traffic-dispatcher/proto/lbs@latest found (v0.0.0-00010101000000-000000000000, replaced by ../../proto), but does not contain package traffic-dispatcher/proto/lbs
+client/passenger.go:6:2: module traffic-dispatcher/proto/lbs@latest found (v0.0.0-00010101000000-000000000000, replaced by ../../proto), but does not contain package traffic-dispatcher/proto/lbs
 
 // https://www.cnblogs.com/t0000/p/13354257.html
 // 参考 test/test_pkg的示例代码
@@ -52,4 +52,14 @@ Broker rabbitmq not found
 2020-07-28 23:12:19  file=notification/publisher.go:31 level=info [pub] Message publication failed: service not found
 
 // 似乎是由于没有首先启动一次subscriber方的程序。。。
+```
+
+- message QueryRequest is already registered
+
+```
+2020/08/11 23:36:17 WARNING: proto: message QueryRequest is already registered
+	previously from: "traffic-dispatcher/proto/driver"
+	currently from:  "traffic-dispatcher/proto/passenger"
+
+// proto下的driver和passenger分别定义了QueryRequest结构体， 似乎这样就在注册到etcd时冲突了？
 ```

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// package go.micro.api.passenger;
+option go_package = ".;passenger";
+
+// import "proto/imports/api.proto";
+
+service PassengerSrv {
+  rpc ReportGeo(ReportPassengerRequest) returns (ReportPassengerResponse);
+  rpc QueryGeo(QueryPassengerRequest) returns (QueryPassengerResponse);
+}
+
+message ReportPassengerRequest {
+  string name = 1;
+  bytes data = 2;
+}
+
+message ReportPassengerResponse {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message QueryPassengerRequest {
+  string name = 1;
+  bytes data = 2;
+}
+
+message QueryPassengerResponse {
+  int32 code = 1;
+  bytes data = 2;
+  string msg = 3;
+}

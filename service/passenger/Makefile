@@ -5,13 +5,13 @@ MODIFY=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto
 .PHONY: proto
 proto:
     
-	protoc --proto_path=. --micro_out=${MODIFY}:. --go_out=${MODIFY}:. proto/passanger/passanger.proto
+	protoc --proto_path=. --micro_out=${MODIFY}:. --go_out=${MODIFY}:. proto/passenger/passenger.proto
     
 
 .PHONY: build
 build: proto
 
-	go build -o passanger-api *.go
+	go build -o passenger-api *.go
 
 .PHONY: test
 test:
@@ -19,4 +19,4 @@ test:
 
 .PHONY: docker
 docker:
-	docker build . -t passanger-api:latest
+	docker build . -t passenger-api:latest

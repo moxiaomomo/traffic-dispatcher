@@ -6,12 +6,12 @@ make build
 ./driver-api --registry=etcd --registry_address=192.168.2.244:2379
 ```
 
-- passanger api 服务订阅
+- passenger api 服务订阅
 
 ```shell
-cd traffic-dispatcher/service/passanger
+cd traffic-dispatcher/service/passenger
 make build
-./passanger-api --registry=etcd --registry_address=192.168.2.244:2379
+./passenger-api --registry=etcd --registry_address=192.168.2.244:2379
 ```
 
 - broker 初始化示例
@@ -78,5 +78,5 @@ import (
 // 司机服务
 ./driver-api --registry=etcd --registry_address=192.168.2.244:2379 --broker=rabbitmq --broker_address=amqp://guest:guest@192.168.2.244:5672
 // 乘客服务
-./passanger-api --registry=etcd --registry_address=192.168.2.244:2379 --broker=rabbitmq --broker_address=amqp://guest:guest@192.168.2.244:5672
+./passenger-api --registry=etcd --registry_address=192.168.2.244:2379 --broker=rabbitmq --broker_address=amqp://guest:guest@192.168.2.244:5672
 ```

@@ -1,11 +1,11 @@
-# Passanger Service
+# Passenger Service
 
-This is the Passanger service
+This is the Passenger service
 
 Generated with
 
 ```
-micro new --namespace=go.micro --type=api passanger
+micro new --namespace=go.micro --type=api passenger
 ```
 
 ## Getting Started
@@ -16,9 +16,9 @@ micro new --namespace=go.micro --type=api passanger
 
 ## Configuration
 
-- FQDN: go.micro.api.passanger
+- FQDN: go.micro.api.passenger
 - Type: api
-- Alias: passanger
+- Alias: passenger
 
 ## Dependencies
 
@@ -46,7 +46,7 @@ make build
 
 Run the service
 ```
-./passanger-api
+./passenger-api
 ```
 
 Build a docker image

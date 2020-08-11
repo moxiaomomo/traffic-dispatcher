@@ -1,34 +1,32 @@
 package main
 
 import (
+	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/broker"
 	log "github.com/micro/go-micro/v2/logger"
 	_ "github.com/micro/go-plugins/broker/rabbitmq/v2"
 
-	"passanger/client"
-	"passanger/handler"
-	"passanger/notification"
-
-	"github.com/micro/go-micro/v2"
-
-	passanger "passanger/proto/passanger"
+	"passenger/client"
+	"passenger/handler"
+	"passenger/notification"
+	passenger "traffic-dispatcher/proto/passenger"
 )
 
 func main() {
 	// New Service
 	service := micro.NewService(
-		micro.Name("go.micro.api.passanger"),
+		micro.Name("go.micro.api.passenger"),
 		micro.Version("latest"),
 	)
 
 	// Initialise service
 	service.Init(
-		// create wrap for the Passanger service client
-		micro.WrapHandler(client.PassangerWrapper(service)),
+		// create wrap for the Passenger service client
+		micro.WrapHandler(client.PassengerWrapper(service)),
 	)
 
 	// Register Handler
-	passanger.RegisterPassangerHandler(service.Server(), new(handler.Passanger))
+	passenger.RegisterPassengerSrvHandler(service.Server(), new(handler.Passenger))
 
 	log.Info(broker.String())
 	if err := broker.Init(); err != nil {

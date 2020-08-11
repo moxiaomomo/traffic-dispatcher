@@ -70,6 +70,14 @@ func (conn *WsConnection) Close() {
 	}
 }
 
+// IsClose 是否已关闭
+func (conn *WsConnection) IsClose() bool {
+	conn.mutex.Lock()
+	defer conn.mutex.Unlock()
+
+	return conn.closed
+}
+
 // ReadMessage : 读取client数据
 func (conn *WsConnection) ReadMessage() (data []byte, err error) {
 	select {
