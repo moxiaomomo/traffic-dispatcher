@@ -6,11 +6,13 @@ MODIFY=Mproto/imports/api.proto=github.com/micro/go-micro/v2/api/proto
 proto:
     
 	protoc --proto_path=. --micro_out=${MODIFY}:. --go_out=${MODIFY}:. proto/admin/admin.proto
-    
 
 .PHONY: build
 build: proto
 
+	mkdir -p ../../proto/admin
+	rm -rf ../../proto/admin/*
+	mv proto/*.pb*.go ../../proto/admin/
 	go build -o admin-api *.go
 
 .PHONY: test

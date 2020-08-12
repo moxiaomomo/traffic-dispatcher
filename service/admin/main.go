@@ -3,11 +3,12 @@ package main
 import (
 	log "github.com/micro/go-micro/v2/logger"
 
-	"github.com/micro/go-micro/v2"
-	"admin/handler"
 	"admin/client"
+	"admin/handler"
 
-	admin "admin/proto/admin"
+	"github.com/micro/go-micro/v2"
+
+	"traffic-dispatcher/proto/admin"
 )
 
 func main() {

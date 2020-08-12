@@ -6,6 +6,8 @@ mkdir -p ${rootDir}/build
 rm -rf ${rootDir}/build/*
 
 # service/driver
-cd ${rootDir}/service/driver/ && go build -o ${rootDir}/build/driver-api *.go 
+cd ${rootDir}/service/driver/ && go build -o ${rootDir}/build/driver-api *.go
+# service/passenger
+cd ${rootDir}/service/passenger/ && go build -o ${rootDir}/build/passenger-api *.go
 # service/gateway
 cd ${rootDir}/service/gateway/ && go build -o ${rootDir}/build/apigw *.go 

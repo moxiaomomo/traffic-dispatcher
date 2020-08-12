@@ -3,12 +3,13 @@ package client
 import (
 	"context"
 
+	"traffic-dispatcher/proto/admin"
+
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/server"
-	admin "path/to/service/proto/admin"
 )
 
-type adminKey struct {}
+type adminKey struct{}
 
 // FromContext retrieves the client from the Context
 func AdminFromContext(ctx context.Context) (admin.AdminService, bool) {

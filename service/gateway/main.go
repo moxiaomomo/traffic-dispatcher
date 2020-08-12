@@ -16,6 +16,8 @@ func main() {
 		log.Fatal("Init", err)
 	}
 
+	service.HandleFunc("/", handler.ApiHandler)
+
 	service.HandleFunc("/hello", handler.HelloHandler)
 	service.HandleFunc("/test/insert", handler.InsertGeoHandler)
 	service.HandleFunc("/test/query", handler.QueryGeoHandler)

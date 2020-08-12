@@ -11,28 +11,7 @@ import (
 	"traffic-dispatcher/model"
 	"traffic-dispatcher/proto/driver"
 	"traffic-dispatcher/proto/passenger"
-
-	"github.com/gorilla/websocket"
-	"github.com/micro/go-micro/v2"
 )
-
-var (
-	wsConn       *websocket.Conn
-	conn         *wsconn.WsConnection
-	wsConnCount  int
-	driverCli    driver.DriverSrvService
-	passengerCli passenger.PassengerSrvService
-)
-
-func init() {
-	drvSvc := micro.NewService(micro.Name("driver.client"))
-	drvSvc.Init()
-	driverCli = driver.NewDriverSrvService("go.micro.api.driver", drvSvc.Client())
-
-	psgSvc := micro.NewService(micro.Name("passenger.client"))
-	psgSvc.Init()
-	passengerCli = passenger.NewPassengerSrvService("go.micro.api.passenger", psgSvc.Client())
-}
 
 func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 	switch cliRole {
