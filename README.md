@@ -1,14 +1,14 @@
-# traffic-dispatcher
+# traffic-dispatcher (In development)
 
 共享出行调度服务
 
 ### 架构设计(V0.2)
 
-![archi_0.2.png](http://47.107.169.20/archi_0.2.png)
+![archi_0.2.png](https://raw.githubusercontent.com/moxiaomomo/traffic-dispatcher/master/doc/archi/archi_0.2.png)
 
 ### API 列表简介(V0.2)
 
-![api-design_0.2.png](http://47.107.169.20/api-design_0.2.png)
+![api-design_0.2.png](https://raw.githubusercontent.com/moxiaomomo/traffic-dispatcher/master/doc/archi/api-design_0.2.png)
 
 ### 环境要求及相关配置
 
