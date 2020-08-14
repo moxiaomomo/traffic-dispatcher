@@ -1,0 +1,85 @@
+version: '2'
+networks:
+  tdsrv:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
+
+services:
+  etcd1:
+    image: quay.io/coreos/etcd:v3.0.15
+    container_name: etcd1
+    tty: true
+    command:
+            etcd
+            -name etcd1
+            -advertise-client-urls http://0.0.0.0:2379
+            -listen-client-urls http://172.30.0.10:2379
+            -listen-peer-urls http://0.0.0.0:2380
+            -initial-cluster-token etcd-cluster
+            -initial-advertise-peer-urls http://172.30.0.10:2380
+            -initial-cluster etcd1=http://172.30.0.10:2380,etcd2=http://172.30.0.11:2380,etcd3=http://172.30.0.12:2380
+            -initial-cluster-state new
+    ports:
+      - '12379:2379'
+      - '12380:2380'
+      - '14001:4001'
+    networks:
+      tdsrv:
+        ipv4_address: 172.30.0.10
+
+  etcd2:
+    image: quay.io/coreos/etcd:v3.0.15
+    container_name: etcd2
+    tty: true
+    command:
+            etcd
+            -name etcd2
+            -advertise-client-urls http://0.0.0.0:2379
+            -listen-client-urls http://172.30.0.11:2379
+            -listen-peer-urls http://0.0.0.0:2380
+            -initial-cluster-token etcd-cluster
+            -initial-advertise-peer-urls http://172.30.0.11:2380
+            -initial-cluster etcd1=http://172.30.0.10:2380,etcd2=http://172.30.0.11:2380,etcd3=http://172.30.0.12:2380
+            -initial-cluster-state new
+    ports:
+      - '13379:2379'
+      - '13380:2380'
+      - '15001:4001'
+    networks:
+      tdsrv:
+        ipv4_address: 172.30.0.11
+
+  etcd3:
+    image: quay.io/coreos/etcd:v3.0.15
+    container_name: etcd3
+    tty: true
+    command:
+            etcd
+            -name etcd3
+            -advertise-client-urls http://0.0.0.0:2379
+            -listen-client-urls http://172.30.0.12:2379
+            -listen-peer-urls http://0.0.0.0:2380
+            -initial-cluster-token etcd-cluster
+            -initial-advertise-peer-urls http://172.30.0.12:2380
+            -initial-cluster etcd1=http://172.30.0.10:2380,etcd2=http://172.30.0.11:2380,etcd3=http://172.30.0.12:2380
+            -initial-cluster-state new
+    ports:
+      - '14379:2379'
+      - '14380:2380'
+      - '16001:4001'
+    networks:
+      tdsrv:
+        ipv4_address: 172.30.0.12
+
+  etcdkeeper:
+    image: evildecay/etcdkeeper:v0.7.6
+    container_name: etcdkeeper
+    tty: true
+    ports:
+      - '8899:8080'
+    networks:
+      tdsrv:
+        ipv4_address: 172.30.0.13

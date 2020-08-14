@@ -23,3 +23,11 @@ root@xiaomo:/home/xiaomo# curl -L http://192.168.2.244:2379/v2/members
 ```
 docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper
 ```
+
+
+- docker-compose启动(etcd及etcdkeeper)
+
+```
+# sudo apt install docker-compose
+docker-compose up -d
+```
