@@ -29,5 +29,7 @@ docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper
 
 ```
 # sudo apt install docker-compose
+# https://www.cnblogs.com/luliAngel/p/etcd.html
+# https://www.jianshu.com/p/44022c67f117
 docker-compose up -d
 ```
