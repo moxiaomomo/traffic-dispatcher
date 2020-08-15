@@ -1,13 +1,11 @@
 package main
 
 import (
-	"traffic-dispatcher/api/handler"
-
-	"github.com/micro/go-micro/v2/logger"
+	"traffic-dispatcher/api/driver/handler"
+	hello "traffic-dispatcher/proto/hello"
 
 	"github.com/micro/go-micro/v2"
-
-	user "traffic-dispatcher/proto/user"
+	"github.com/micro/go-micro/v2/logger"
 )
 
 // 将grpc服务转为restful接口
@@ -16,14 +14,14 @@ func main() {
 	service := micro.NewService(
 		// go.micro.api是默认命名空间，访问api需要带上user命名空间，如：/user/xx
 		// 如果不想使用默认命名空间可以在启动服务是设置
-		micro.Name("go.micro.api.user"),
+		micro.Name("go.micro.api.driver"),
 	)
 
 	service.Init()
 
 	service.Server().Handle(
 		service.Server().NewHandler(
-			&handler.Say{Client: user.NewUserService("go.micro.srv.user", service.Client())},
+			&handler.Say{Client: hello.NewSayService("go.micro.srv.order", service.Client())},
 		),
 	)
 

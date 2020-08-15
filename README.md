@@ -40,9 +40,15 @@
 - dispatcher 派遣调度服务 (默认端口：18004)
 - notification 全局消息服务 (默认端口：18005)
 
-### 编译
+### 测试
 
 ```shell
 # in development
-./build-all.sh
+# --registry_address 按实际情况修改
+# 启动 order backend service
+go run service/order/main.go --registry=etcd --registry_address=192.168.2.244:2379
+# 启动 driver api service
+go run api/driver/main.go --registry=etcd --registry_address=192.168.2.244:2379
+# 启动micro api gateway
+micro --registry=etcd --registry_address=192.168.2.244:2379 api
 ```

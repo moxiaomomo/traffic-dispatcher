@@ -18,7 +18,7 @@ func main() {
 	service.Init()
 
 	// Create new user client
-	post := postProto.NewPostService("go.micro.srv.user", service.Client())
+	user := userProto.NewUserService("go.micro.srv.user", service.Client())
 
 	// Call the user
 	rsp, err := user.QueryUserByName(context.TODO(), &userProto.Request{UserName: "John"})

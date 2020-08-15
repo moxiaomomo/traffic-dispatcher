@@ -14,11 +14,11 @@
 xiaomo@xiaomo:~$ micro --registry=etcd --registry_address=192.168.2.244:2379 api --handler=api
 {"id":"go.micro.client","code":500,"detail":"connection error: desc = \"transport: Error while dialing dial tcp 127.0.0.1:8081: connect: connection refused\"","status":"Internal Server Error"}
 
-// micro --registry=etcd --registry_address=192.168.2.244:2379 api  (无法启动)
-micro --registry=etcd --registry_address=192.168.2.244:2379 (正常启动)
+// micro --registry=etcd --registry_address=192.168.2.244:2379 api --handler=api (无法启动)
+micro --registry=etcd --registry_address=192.168.2.244:2379 api (正常启动)
 ```
 
-- 导入本地包的问题
+- 导入本地包的问题（1）
 
 ```
 xiaomo@xiaomo:/data/go/src/traffic-dispatcher/service/passenger$ make build
@@ -35,6 +35,15 @@ client/passenger.go:6:2: module traffic-dispatcher/proto/lbs@latest found (v0.0.
 
 // https://www.cnblogs.com/t0000/p/13354257.html
 // 参考 test/test_pkg的示例代码
+```
+
+- - 导入本地包的问题（2）
+
+```
+client/main.go:8:2: package traffic-dispatcher/proto/user is not in GOROOT (/usr/local/go/src/traffic-dispatcher/proto/user)
+
+// 修改go.mod
+replace traffic-dispatcher/proto => ./proto
 ```
 
 - broker 使用 rabbitmq 问题
@@ -62,4 +71,29 @@ Broker rabbitmq not found
 	currently from:  "traffic-dispatcher/proto/passenger"
 
 // proto下的driver和passenger分别定义了QueryRequest结构体， 似乎这样就在注册到etcd时冲突了？
+```
+
+- grpc 版本冲突
+
+```
+# github.com/coreos/etcd/clientv3/balancer/resolver/endpoint
+../../pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/resolver/endpoint/endpoint.go:114:78: undefined: resolver.BuildOption
+../../pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/resolver/endpoint/endpoint.go:182:31: undefined: resolver.ResolveNowOption
+# github.com/coreos/etcd/clientv3/balancer/picker
+../../pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/picker/err.go:37:44: undefined: balancer.PickOptions
+../../pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/picker/roundrobin_balanced.go:55:54: undefined: balancer.PickOptions
+
+// 修改go.mod
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+```
+
+- 其他常见issue
+
+```
+// error during request: unknown field \"name\" in go_api.Request
+Error with Micro-Go-API #286: https://github.com/micro/micro/issues/286
+
+// micro api --handler=api 
+https://github.com/micro/micro/issues/944
+https://github.com/micro/micro/issues/929
 ```
