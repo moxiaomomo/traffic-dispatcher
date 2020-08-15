@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 // package proto;
-option go_package=".;driver";
+option go_package=".;geo";
 
-service DriverSrv {
+service GeoLocation {
     rpc ReportGeo (ReportRequest) returns (ReportResponse);
     rpc QueryGeo (QueryRequest) returns (QueryResponse);
 }

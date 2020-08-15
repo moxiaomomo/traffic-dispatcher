@@ -40,6 +40,15 @@
 - dispatcher 派遣调度服务 (默认端口：18004)
 - notification 全局消息服务 (默认端口：18005)
 
+## 编译
+
+- 编译proto
+
+```shell
+# geo.proto
+protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/geo.proto
+```
+
 ### 测试
 
 ```shell
