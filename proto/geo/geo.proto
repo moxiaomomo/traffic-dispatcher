@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+// package proto;
+option go_package=".;geo";
+
+service GeoLocation {
+    rpc ReportGeo (ReportRequest) returns (ReportResponse);
+    rpc QueryGeo (QueryRequest) returns (QueryResponse);
+}
+
+message  ReportRequest{
+    string name = 1;
+    bytes data = 2;
+}
+
+message ReportResponse{
+    int32 code = 1;
+    string msg = 2;
+}
+
+message  QueryRequest{
+    string name = 1;
+    bytes data = 2;
+}
+
+message QueryResponse{
+    int32 code = 1;
+    bytes data = 2;
+    string msg = 3;
+}
