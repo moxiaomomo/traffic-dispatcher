@@ -1,3 +1,13 @@
+- 无法使用`micro`命令工具
+
+```
+$micro -h
+qtls.ConnectionState not compatible with tls.ConnectionState
+// ...
+
+// 将Go1.15换回Go1.14后可正常使用micro命令
+```
+
 - `micro server`开启后日志报错:
 
 ```
@@ -37,7 +47,7 @@ client/passenger.go:6:2: module traffic-dispatcher/proto/lbs@latest found (v0.0.
 // 参考 test/test_pkg的示例代码
 ```
 
-- - 导入本地包的问题（2）
+- 导入本地包的问题（2）
 
 ```
 client/main.go:8:2: package traffic-dispatcher/proto/user is not in GOROOT (/usr/local/go/src/traffic-dispatcher/proto/user)
@@ -63,7 +73,7 @@ Broker rabbitmq not found
 // 似乎是由于没有首先启动一次subscriber方的程序。。。
 ```
 
-- message QueryRequest is already registered
+- message QueryRequest is already registered
 
 ```
 2020/08/11 23:36:17 WARNING: proto: message QueryRequest is already registered
