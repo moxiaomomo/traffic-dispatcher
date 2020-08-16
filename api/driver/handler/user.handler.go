@@ -16,12 +16,14 @@ type Say struct {
 }
 
 //http://localhost:8080/driver/say/hello?name=xxxx
-func (s *Say) Hello(ctx context.Context, req map[string]string, rsp *api.Response) error {
-//func (s *Say) Hello(ctx context.Context, req *api.Request, rsp *api.Response) error {
+// func (s *Say) Hello(ctx context.Context, req map[string]string, rsp *api.Response) error {
+func (s *Say) Hello(ctx context.Context, req *api.Request, rsp *api.Response) error {
 	logger.Info("Received Say.Hello API request")
 
-	name, ok := req["name"]
-	if !ok || len(name) == 0 {
+	// name, ok := req["name"]
+	// if !ok || len(name) == 0 {
+	name, ok := req.Get["name"]
+	if !ok || len(name.Values) == 0 {
 		return errors.BadRequest("go.micro.api.driver", "Name cannot be blank")
 	}
 

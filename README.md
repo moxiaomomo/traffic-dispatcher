@@ -55,9 +55,11 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 # in development
 # --registry_address 按实际情况修改
 # 启动 order backend service
-go run service/order/main.go --registry=etcd --registry_address=192.168.2.244:2379
+go run service/order/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 driver api service
-go run api/driver/main.go --registry=etcd --registry_address=192.168.2.244:2379
+go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
-micro --registry=etcd --registry_address=192.168.2.244:2379 api
+micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
+# 测试
+curl http://localhost:8080/driver/say/hello?name=xiaohua
 ```
