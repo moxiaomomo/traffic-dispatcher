@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	driverCount = 30
+	driverCount = 3
 )
 
 var (
@@ -28,7 +28,7 @@ var (
 )
 
 func oneClient(interrupt chan os.Signal, user model.User, point model.GeoLocation, idx int) {
-	u := url.URL{Scheme: "ws", Host: *wsAddr, Path: "/ws/lbs"}
+	u := url.URL{Scheme: "ws", Host: *wsAddr, Path: "/geo/ws/lbs"}
 	log.Printf("Client [%d] try to connect to server %s\n", idx, u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -101,7 +101,7 @@ func main() {
 	// 监听和捕获信号量
 	signal.Notify(interrupt, os.Interrupt)
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < driverCount; i++ {
 		go oneClient(
 			interrupt,
 			model.User{

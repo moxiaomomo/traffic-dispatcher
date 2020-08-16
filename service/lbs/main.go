@@ -1,33 +1,19 @@
 package main
 
 import (
-	"traffic-dispatcher/service/handler"
-
-	"github.com/micro/go-micro/v2/logger"
+	geo "traffic-dispatcher/proto/geo"
+	user "traffic-dispatcher/proto/user"
+	"traffic-dispatcher/service/lbs/handler"
 
 	"github.com/micro/go-micro/v2"
-
-	//"github.com/micro/go-micro/v2/client/selector"
-	//"github.com/micro/go-micro/v2/registry"
-	//"github.com/micro/go-micro/v2/registry/etcd"
-
-	user "traffic-dispatcher/proto/user"
+	"github.com/micro/go-micro/v2/logger"
 )
 
 func main() {
-	//reg := etcd.NewRegistry(func(options *registry.Options) {
-	//	options.Addrs = []string{
-	//		"xx.xx.xx.xx:2379",
-	//	}
-	//})
-	//micro.Selector(selector.NewSelector(func(options *selector.Options) {
-	//	options.Registry=reg
-	//}))
 	// New Service
 	service := micro.NewService(
 		// micro.Registry(reg),
-		micro.Name("go.micro.srv.user"),
-		micro.Version("latest"),
+		micro.Name("go.micro.srv.lbs"),
 	)
 
 	// Initialise service
@@ -35,6 +21,7 @@ func main() {
 
 	// Register Handler
 	user.RegisterUserHandler(service.Server(), new(handler.User))
+	geo.RegisterGeoLocationHandler(service.Server(), new(handler.GeoLocation))
 
 	// Run service
 	if err := service.Run(); err != nil {

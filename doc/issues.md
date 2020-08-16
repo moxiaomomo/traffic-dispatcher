@@ -107,3 +107,17 @@ Error with Micro-Go-API #286: https://github.com/micro/micro/issues/286
 https://github.com/micro/micro/issues/944
 https://github.com/micro/micro/issues/929
 ```
+
+- 重复注册
+
+```
+panic: proto: duplicate proto message registered: go.micro.broker.Message.HeaderEntry
+
+// 原有代码
+	drvSvc := micro.NewService(micro.Name("driver.client"))
+	drvSvc.Init()
+	driverCli = driver.NewDriverSrvService("go.micro.api.driver", drvSvc.Client())
+// 修改
+// 	"github.com/micro/go-micro/v2/client"
+driverCli = driver.NewDriverSrvService("go.micro.api.driver", client.DefaultClient)
+```
