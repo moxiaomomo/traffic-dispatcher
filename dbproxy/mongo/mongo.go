@@ -1,4 +1,4 @@
-package dbproxy
+package mongo
 
 import (
 	"context"

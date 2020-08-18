@@ -51,15 +51,30 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 
 ### 测试
 
-```shell
+- 测试web接口 (QueryUserByName)
+
+```bash
 # in development
 # --registry_address 按实际情况修改
-# 启动 order backend service
-go run service/order/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# 启动 user backend service
+go run service/user/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 driver api service
 go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
 # 测试
-curl http://localhost:8080/driver/say/hello?name=xiaohua
+curl http://localhost:8080/driver/user/queryUserByName?name=xiaohua
+# {"err":null,"msg":true,"user":{"name":"xiaohua","pwd":"somepwd"}}
 ```
+
+- 测试websocket传输
+
+```bash
+# service/lbs
+go run service/lbs/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# web/geo
+go run web/geo/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# micro web
+micro --registry=etcd --registry_address=172.30.0.10:2379 web 
+```
+
