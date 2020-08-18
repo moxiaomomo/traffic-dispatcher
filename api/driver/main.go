@@ -2,7 +2,7 @@ package main
 
 import (
 	"traffic-dispatcher/api/driver/handler"
-	hello "traffic-dispatcher/proto/hello"
+	user "traffic-dispatcher/proto/user"
 
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/logger"
@@ -21,7 +21,7 @@ func main() {
 
 	service.Server().Handle(
 		service.Server().NewHandler(
-			&handler.Say{Client: hello.NewSayService("go.micro.srv.order", service.Client())},
+			&handler.User{Client: user.NewUserService("go.micro.srv.user", service.Client())},
 		),
 	)
 

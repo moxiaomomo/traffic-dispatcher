@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"traffic-dispatcher/dbproxy"
+	mongoProxy "traffic-dispatcher/dbproxy/mongo"
 	"traffic-dispatcher/model"
 	"traffic-dispatcher/proto/geo"
 
@@ -22,7 +22,7 @@ var clientDBMap = map[model.ClientRole]string{
 }
 
 func InsertGeo(resolution int, data model.WSMessage) {
-	dbCli := dbproxy.MongoConn()
+	dbCli := mongoProxy.MongoConn()
 	// 指定获取要操作的数据集
 	collection := dbCli.Database(clientDBMap[data.Role]).Collection("geoInfo")
 
@@ -59,7 +59,7 @@ func InsertGeo(resolution int, data model.WSMessage) {
 }
 
 func QueryGeo(lat float64, lng float64, role model.ClientRole) (res []model.UserLocation, err error) {
-	dbCli := dbproxy.MongoConn()
+	dbCli := mongoProxy.MongoConn()
 	// 指定获取要操作的数据集
 	collection := dbCli.Database(clientDBMap[role]).Collection("geoInfo")
 

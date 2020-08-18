@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	defultLog "log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +57,8 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	}
 
 	wsConnCount++
-	log.Infof("Current connection count: %d\n", wsConnCount)
+	// log.Infof("Current connection count: %d\n", wsConnCount) // not works
+	defultLog.Printf("Current connection count: %v\n", wsConnCount)
 
 	// 启动协程，持续发信息
 	go func() {
