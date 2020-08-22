@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const mySQLSource = "admin:admin2020@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=utf8"
+const mySQLSource = "admin:admin^2020@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=utf8"
 
 var db *sql.DB
 

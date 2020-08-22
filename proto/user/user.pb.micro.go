@@ -42,6 +42,13 @@ func NewUserEndpoints() []*api.Endpoint {
 // Client API for User service
 
 type UserService interface {
+	// 用户注册
+	Signup(ctx context.Context, in *ReqSignup, opts ...client.CallOption) (*RespSignup, error)
+	// 用户登录
+	Signin(ctx context.Context, in *ReqSignin, opts ...client.CallOption) (*RespSignin, error)
+	// 获取用户信息
+	UserInfo(ctx context.Context, in *ReqUserInfo, opts ...client.CallOption) (*RespUserInfo, error)
+	// test
 	QueryUserByName(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
 }
 
@@ -57,6 +64,36 @@ func NewUserService(name string, c client.Client) UserService {
 	}
 }
 
+func (c *userService) Signup(ctx context.Context, in *ReqSignup, opts ...client.CallOption) (*RespSignup, error) {
+	req := c.c.NewRequest(c.name, "User.Signup", in)
+	out := new(RespSignup)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Signin(ctx context.Context, in *ReqSignin, opts ...client.CallOption) (*RespSignin, error) {
+	req := c.c.NewRequest(c.name, "User.Signin", in)
+	out := new(RespSignin)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) UserInfo(ctx context.Context, in *ReqUserInfo, opts ...client.CallOption) (*RespUserInfo, error) {
+	req := c.c.NewRequest(c.name, "User.UserInfo", in)
+	out := new(RespUserInfo)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userService) QueryUserByName(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
 	req := c.c.NewRequest(c.name, "User.QueryUserByName", in)
 	out := new(Response)
@@ -70,11 +107,21 @@ func (c *userService) QueryUserByName(ctx context.Context, in *Request, opts ...
 // Server API for User service
 
 type UserHandler interface {
+	// 用户注册
+	Signup(context.Context, *ReqSignup, *RespSignup) error
+	// 用户登录
+	Signin(context.Context, *ReqSignin, *RespSignin) error
+	// 获取用户信息
+	UserInfo(context.Context, *ReqUserInfo, *RespUserInfo) error
+	// test
 	QueryUserByName(context.Context, *Request, *Response) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
+		Signup(ctx context.Context, in *ReqSignup, out *RespSignup) error
+		Signin(ctx context.Context, in *ReqSignin, out *RespSignin) error
+		UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error
 		QueryUserByName(ctx context.Context, in *Request, out *Response) error
 	}
 	type User struct {
@@ -86,6 +133,18 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 
 type userHandler struct {
 	UserHandler
+}
+
+func (h *userHandler) Signup(ctx context.Context, in *ReqSignup, out *RespSignup) error {
+	return h.UserHandler.Signup(ctx, in, out)
+}
+
+func (h *userHandler) Signin(ctx context.Context, in *ReqSignin, out *RespSignin) error {
+	return h.UserHandler.Signin(ctx, in, out)
+}
+
+func (h *userHandler) UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error {
+	return h.UserHandler.UserInfo(ctx, in, out)
 }
 
 func (h *userHandler) QueryUserByName(ctx context.Context, in *Request, out *Response) error {

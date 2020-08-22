@@ -42,7 +42,7 @@
 
 ## 编译
 
-- 编译proto
+- 编译 proto
 
 ```shell
 # geo.proto
@@ -51,7 +51,7 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 
 ### 测试
 
-- 测试web接口 (QueryUserByName)
+- 测试 web 接口 (QueryUserByName)
 
 ```bash
 # in development
@@ -60,14 +60,18 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 go run service/user/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 driver api service
 go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# 启动 passenger api service
+go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
 # 测试
 curl http://localhost:8080/driver/user/queryUserByName?name=xiaohua
 # {"err":null,"msg":true,"user":{"name":"xiaohua","pwd":"somepwd"}}
+curl "http://localhost:8080/passenger/user/signup?username=xiaohua&password=xxyyzz"
+# {"code":1,"msg":"Signup succeeded."}
 ```
 
-- 测试websocket传输
+- 测试 websocket 传输
 
 ```bash
 # service/lbs
@@ -75,6 +79,5 @@ go run service/lbs/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # web/geo
 go run web/geo/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # micro web
-micro --registry=etcd --registry_address=172.30.0.10:2379 web 
+micro --registry=etcd --registry_address=172.30.0.10:2379 web
 ```
-
