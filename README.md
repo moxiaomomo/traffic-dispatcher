@@ -51,7 +51,7 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 
 ### 测试
 
-- 测试 web 接口 (QueryUserByName)
+- 测试 web 接口
 
 ```bash
 # in development
@@ -69,6 +69,8 @@ curl http://localhost:8080/driver/user/queryUserByName?name=xiaohua
 # {"err":null,"msg":true,"user":{"name":"xiaohua","pwd":"somepwd"}}
 curl "http://localhost:8080/passenger/user/signup?username=xiaohua&password=xxyyzz"
 # {"code":1,"msg":"Signup succeeded."}
+curl "http://localhost:8080/passenger/user/signin?username=xiaohua&password=xxyyzz"
+# {"code":1,"msg":"Signin succeeded."}
 ```
 
 - 测试 websocket 传输

@@ -42,6 +42,7 @@ message Response {
 message ReqSignup {
   string username = 1;
   string password = 2;
+  int32 role = 3;
 }
 
 message RespSignup {
@@ -52,6 +53,7 @@ message RespSignup {
 message ReqSignin {
   string username = 1;
   string password = 2;
+  int32 role = 3;
 }
 
 message RespSignin {
@@ -60,7 +62,10 @@ message RespSignin {
   string message = 3;
 }
 
-message ReqUserInfo { string username = 1; }
+message ReqUserInfo {
+  string username = 1;
+  int32 role = 2;
+}
 
 message RespUserInfo {
   int32 code = 1;

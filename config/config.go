@@ -14,4 +14,7 @@ const (
 
 	// MongoSource mongodb地址
 	MongoSource = "mongodb://127.0.0.1:27017"
+
+	// RedisSessionPrefix 用户登录session信息
+	RedisSessionPrefix = "SESSION_"
 )
