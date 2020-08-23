@@ -24,11 +24,12 @@ func (s *User) QueryUserByName(ctx context.Context, req *api.Request, rsp *api.R
 		return errors.BadRequest("go.micro.api.driver", "Name cannot be blank")
 	}
 
-	// 在restful api中调用rpc服务
-	response, err := s.Client.QueryUserByName(ctx, &user.Request{
-		UserID:   "testuserid",
+	var reqUser = user.User{
 		UserName: name.Values[0],
-		UserPwd:  "somepwd",
+	}
+	// 在restful api中调用rpc服务
+	response, err := s.Client.UserInfo(ctx, &user.ReqUserInfo{
+		User: &reqUser,
 	})
 
 	if err != nil {
@@ -37,9 +38,9 @@ func (s *User) QueryUserByName(ctx context.Context, req *api.Request, rsp *api.R
 
 	rsp.StatusCode = 200
 	b, _ := json.Marshal(map[string]interface{}{
+		"code": response.GetCode(),
 		"user": response.GetUser(),
-		"err":  response.GetError(),
-		"msg":  response.GetSuccess(),
+		"msg":  response.GetMessage(),
 	})
 	rsp.Body = string(b)
 

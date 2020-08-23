@@ -65,12 +65,10 @@ go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
 # 测试
-curl http://localhost:8080/driver/user/queryUserByName?name=xiaohua
-# {"err":null,"msg":true,"user":{"name":"xiaohua","pwd":"somepwd"}}
-curl "http://localhost:8080/passenger/user/signup?username=xiaohua&password=xxyyzz"
+curl -X POST "http://localhost:8080/passenger/user/signup" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"xxyytt"}'
 # {"code":1,"msg":"Signup succeeded."}
-curl "http://localhost:8080/passenger/user/signin?username=xiaohua&password=xxyyzz"
-# {"code":1,"msg":"Signin succeeded."}
+curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"xxyytt"}'
+# {"code":1,"msg":"Signin succeeded.","user":{"id":3,"userID":"8008b64187fea0465e72aeb76a01dc49","userName":"xiaomo","userPwd":"xxyytt"}}
 ```
 
 - 测试 websocket 传输

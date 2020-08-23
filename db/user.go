@@ -41,13 +41,14 @@ func Signup(user *orm.User) error {
 }
 
 // Signin 用户登录
-func Signin(user *orm.User) error {
-	var dbUser orm.User
+func Signin(user *orm.User) (dbUser orm.User, err error) {
 	dbmysql.Conn().Where("user_name = ?", user.UserName).First(&dbUser)
 	if dbUser.UserName != user.UserName {
-		return errors.New("No user matched")
+		err = errors.New("No user matched")
+		return
 	} else if dbUser.UserPwd != user.UserPwd {
-		return errors.New("User password does not match")
+		err = errors.New("User password does not match")
+		return
 	}
 
 	rConn := dbredis.Conn()
@@ -56,6 +57,5 @@ func Signin(user *orm.User) error {
 	hKey := genSessionID(&dbUser)
 	rConn.Do("HSET", hKey, "token", genToken(&dbUser))
 	rConn.Do("EXPIRE", hKey, 43200) // 12h
-
-	return nil
+	return
 }
