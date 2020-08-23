@@ -25,6 +25,7 @@ require (
 	traffic-dispatcher/db v1.0.0
 	traffic-dispatcher/model v1.0.0
 	traffic-dispatcher/proto v1.0.0
+	traffic-dispatcher/util v1.0.0
 )
 
 replace traffic-dispatcher/proto => ./proto
@@ -36,5 +37,7 @@ replace traffic-dispatcher/model => ./model
 replace traffic-dispatcher/db => ./db
 
 replace traffic-dispatcher/net => ./net
+
+replace traffic-dispatcher/util => ./util
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

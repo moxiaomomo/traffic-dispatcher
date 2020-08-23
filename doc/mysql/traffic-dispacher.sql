@@ -7,6 +7,7 @@ use traffic-dispatcher;
 CREATE TABLE `tbl_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` int(11) DEFAULT 0 COMMENT '用户角色,0:passenger,1:driver,2:admin,...',
+  `user_id` varchar(64) NOT NULL DEFAULT '' COMMENT '用户唯一id',
   `user_name` varchar(64) NOT NULL DEFAULT '' COMMENT '用户名',
   `user_pwd` varchar(256) NOT NULL DEFAULT '' COMMENT '用户密码(加密)',
   `email` varchar(64) DEFAULT '' COMMENT '邮箱',
@@ -18,6 +19,7 @@ CREATE TABLE `tbl_user` (
   `profile` text COMMENT '用户属性',
   `status` int(11) NOT NULL DEFAULT '0' COMMENT '账户状态(启用/禁用/锁定/标记删除等)',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_userid` (`user_id`),
   UNIQUE KEY `idx_username_role` (`user_name`,`role`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

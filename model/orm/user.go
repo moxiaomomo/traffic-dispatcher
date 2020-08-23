@@ -10,6 +10,8 @@ type User struct {
 	Id uint
 	// 用户角色
 	Role int
+	// 用户id
+	UserId string
 	// 用户名
 	UserName string
 	// 用户加密密码

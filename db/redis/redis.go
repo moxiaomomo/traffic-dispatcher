@@ -62,3 +62,8 @@ func init() {
 func ConnPool() *redis.Pool {
 	return pool
 }
+
+// Conn redis连接
+func Conn() redis.Conn {
+	return pool.Get()
+}

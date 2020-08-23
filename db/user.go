@@ -1,42 +1,61 @@
 package db
 
 import (
-	"log"
-	"os"
-
-	"github.com/jinzhu/gorm"
-	// mysql
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"errors"
+	"fmt"
+	"time"
 
 	"traffic-dispatcher/config"
+	dbmysql "traffic-dispatcher/db/mysql"
+	dbredis "traffic-dispatcher/db/redis"
 	"traffic-dispatcher/model/orm"
+	"traffic-dispatcher/util"
 )
 
-var dbCli *gorm.DB
-
-func init() {
-	var err error
-	dbCli, err = gorm.Open("mysql", config.MySQLSource)
-	// defer db.Close()
-	if err != nil {
-		log.Printf("connect mysql error: %s", err.Error())
-		os.Exit(1)
+func genUserID(user *orm.User) string {
+	if len(user.UserId) == 32 {
+		return user.UserId
 	}
+	tmp := fmt.Sprintf("%s%d", user.UserName, user.Role)
+	return util.MD5([]byte(tmp))
+}
 
-	// 设置表名映射规则
-	dbCli.SingularTable(true) // 禁用表名复数
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return "tbl_" + defaultTableName
-	}
-	// 设置连接
-	dbCli.DB().SetMaxIdleConns(10)
-	dbCli.DB().SetMaxOpenConns(100)
+func genSessionID(user *orm.User) string {
+	return config.RedisSessionPrefix + genUserID(user)
+}
+
+func genToken(user *orm.User) string {
+	// 40位字符:md5(username+timestamp+token_salt)+timestamp[:8]
+	ts := fmt.Sprintf("%x", time.Now().Unix())
+	tokenPrefix := util.MD5([]byte(genUserID(user) + ts + "_tokensalt"))
+	return tokenPrefix + ts[:8]
 }
 
 // Signup 用户注册
 func Signup(user *orm.User) error {
-	if err := dbCli.Create(user).Error; err != nil {
+	user.UserId = genUserID(user)
+	if err := dbmysql.Conn().Create(user).Error; err != nil {
 		return err
 	}
+	return nil
+}
+
+// Signin 用户登录
+func Signin(user *orm.User) error {
+	var dbUser orm.User
+	dbmysql.Conn().Where("user_name = ?", user.UserName).First(&dbUser)
+	if dbUser.UserName != user.UserName {
+		return errors.New("No user matched")
+	} else if dbUser.UserPwd != user.UserPwd {
+		return errors.New("User password does not match")
+	}
+
+	rConn := dbredis.Conn()
+	defer rConn.Close()
+
+	hKey := genSessionID(&dbUser)
+	rConn.Do("HSET", hKey, "token", genToken(&dbUser))
+	rConn.Do("EXPIRE", hKey, 43200) // 12h
+
 	return nil
 }
