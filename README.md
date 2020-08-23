@@ -24,8 +24,17 @@
 - Protobuf (V3)
 - Docker (部署微服务等)
 
-(前端测试) [web_admin](https://github.com/moxiaomomo/traffic-dispatcher-admin)
+(前端测试)
 
+[web_admin](https://github.com/moxiaomomo/traffic-dispatcher-admin)
+
+- Vue 2.x
+- Baidu map API
+- Typescript 3.x
+
+[app_test](https://github.com/moxiaomomo/traffic-dispatcher-cli)
+
+- uni-app
 - Vue 2.x
 - Baidu map API
 - Typescript 3.x
