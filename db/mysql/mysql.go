@@ -2,24 +2,23 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
-	"log"
 	"os"
 
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
-)
+	"github.com/micro/go-micro/v2/logger"
 
-const mySQLSource = "admin:admin2020@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=utf8"
+	"traffic-dispatcher/config"
+)
 
 var db *sql.DB
 
 func init() {
-	db, _ = sql.Open("mysql", mySQLSource)
+	db, _ = sql.Open("mysql", config.MySQLSource)
 	db.SetMaxOpenConns(1000)
 	err := db.Ping()
 	if err != nil {
-		fmt.Println("Failed to connect to mysql, err:" + err.Error())
+		logger.Info("Failed to connect to mysql, err:" + err.Error())
 		os.Exit(1)
 	}
 }
@@ -31,7 +30,7 @@ func DBConn() *sql.DB {
 
 func CheckErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 		panic(err)
 	}
 }

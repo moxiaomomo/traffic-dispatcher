@@ -20,18 +20,21 @@ require (
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0
-	traffic-dispatcher/connection v1.0.0
-	traffic-dispatcher/dbproxy v1.0.0
+	traffic-dispatcher/config v1.0.0
+	traffic-dispatcher/net v1.0.0
+	traffic-dispatcher/db v1.0.0
 	traffic-dispatcher/model v1.0.0
 	traffic-dispatcher/proto v1.0.0
 )
 
 replace traffic-dispatcher/proto => ./proto
 
+replace traffic-dispatcher/config => ./config
+
 replace traffic-dispatcher/model => ./model
 
-replace traffic-dispatcher/dbproxy => ./dbproxy
+replace traffic-dispatcher/db => ./db
 
-replace traffic-dispatcher/connection => ./connection
+replace traffic-dispatcher/net => ./net
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

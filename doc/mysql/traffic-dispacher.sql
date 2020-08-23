@@ -1,5 +1,6 @@
 create database `traffic-dispatcher` default character set utf8;
-
+-- grant all privileges on `traffic-dispatcher`.* to 'admin'@'%' identified by 'test123456';
+-- flush privileges;
 use traffic-dispatcher;
 
 -- 创建用户表
@@ -20,5 +21,3 @@ CREATE TABLE `tbl_user` (
   UNIQUE KEY `idx_username_role` (`user_name`,`role`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- grant all privileges on `traffic-dispatcher`.* to admin@'%' identified by 'admin2020';
