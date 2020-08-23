@@ -2,9 +2,9 @@
 
 共享出行调度服务
 
-### 架构设计(V0.2)
+### 架构设计(V0.3)
 
-![archi_0.2.png](https://raw.githubusercontent.com/moxiaomomo/traffic-dispatcher/master/doc/archi/archi_0.2.png)
+![archi_0.3.png](https://raw.githubusercontent.com/moxiaomomo/traffic-dispatcher/master/doc/archi/archi_0.3.png)
 
 ### API 列表简介(V0.2)
 
