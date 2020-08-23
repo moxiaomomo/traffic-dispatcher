@@ -14,21 +14,20 @@ type User struct {
 	Client user.UserService
 }
 
+func parseReqBody(req *api.Request) (reqUser user.User, err error) {
+	err = json.Unmarshal([]byte(req.Body), &reqUser)
+	return
+}
+
 func (s *User) Signup(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	username, ok := req.Get["username"]
-	if !ok || len(username.Values) == 0 {
-		return errors.BadRequest("go.micro.api.passenger", "Name cannot be blank")
-	}
-	password, ok := req.Get["password"]
-	if !ok || len(password.Values) == 0 {
-		return errors.BadRequest("go.micro.api.passenger", "Pwd cannot be blank")
+	reqUser, err := parseReqBody(req)
+	if err != nil {
+		return errors.BadRequest("go.micro.api.passenger", "request invalid")
 	}
 
 	response, err := s.Client.Signup(ctx, &user.ReqSignup{
-		Username: username.Values[0],
-		Password: password.Values[0],
+		User: &reqUser,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -44,20 +43,14 @@ func (s *User) Signup(ctx context.Context, req *api.Request, rsp *api.Response) 
 }
 
 func (s *User) Signin(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	username, ok := req.Get["username"]
-	if !ok || len(username.Values) == 0 {
-		return errors.BadRequest("go.micro.api.passenger", "Name cannot be blank")
-	}
-	password, ok := req.Get["password"]
-	if !ok || len(password.Values) == 0 {
-		return errors.BadRequest("go.micro.api.passenger", "Pwd cannot be blank")
+	reqUser, err := parseReqBody(req)
+	if err != nil {
+		return errors.BadRequest("go.micro.api.passenger", "request invalid")
 	}
 
 	response, err := s.Client.Signin(ctx, &user.ReqSignin{
-		Username: username.Values[0],
-		Password: password.Values[0],
+		User: &reqUser,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -65,6 +58,7 @@ func (s *User) Signin(ctx context.Context, req *api.Request, rsp *api.Response) 
 	rsp.StatusCode = 200
 	b, _ := json.Marshal(map[string]interface{}{
 		"code": response.GetCode(),
+		"user": response.GetUser(),
 		"msg":  response.GetMessage(),
 	})
 	rsp.Body = string(b)

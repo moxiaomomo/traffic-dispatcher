@@ -48,8 +48,6 @@ type UserService interface {
 	Signin(ctx context.Context, in *ReqSignin, opts ...client.CallOption) (*RespSignin, error)
 	// 获取用户信息
 	UserInfo(ctx context.Context, in *ReqUserInfo, opts ...client.CallOption) (*RespUserInfo, error)
-	// test
-	QueryUserByName(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
 }
 
 type userService struct {
@@ -94,16 +92,6 @@ func (c *userService) UserInfo(ctx context.Context, in *ReqUserInfo, opts ...cli
 	return out, nil
 }
 
-func (c *userService) QueryUserByName(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "User.QueryUserByName", in)
-	out := new(Response)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for User service
 
 type UserHandler interface {
@@ -113,8 +101,6 @@ type UserHandler interface {
 	Signin(context.Context, *ReqSignin, *RespSignin) error
 	// 获取用户信息
 	UserInfo(context.Context, *ReqUserInfo, *RespUserInfo) error
-	// test
-	QueryUserByName(context.Context, *Request, *Response) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -122,7 +108,6 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		Signup(ctx context.Context, in *ReqSignup, out *RespSignup) error
 		Signin(ctx context.Context, in *ReqSignin, out *RespSignin) error
 		UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error
-		QueryUserByName(ctx context.Context, in *Request, out *Response) error
 	}
 	type User struct {
 		user
@@ -145,8 +130,4 @@ func (h *userHandler) Signin(ctx context.Context, in *ReqSignin, out *RespSignin
 
 func (h *userHandler) UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error {
 	return h.UserHandler.UserInfo(ctx, in, out)
-}
-
-func (h *userHandler) QueryUserByName(ctx context.Context, in *Request, out *Response) error {
-	return h.UserHandler.QueryUserByName(ctx, in, out)
 }
