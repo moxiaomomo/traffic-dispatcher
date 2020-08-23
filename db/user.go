@@ -42,6 +42,11 @@ func Signup(user *orm.User) error {
 
 // Signin 用户登录
 func Signin(user *orm.User) (dbUser orm.User, err error) {
+	if user.UserPwd == "" || user.UserName == "" {
+		err = errors.New("Invalid user request")
+		return
+	}
+
 	dbmysql.Conn().Where("user_name = ?", user.UserName).First(&dbUser)
 	if dbUser.UserName != user.UserName {
 		err = errors.New("No user matched")
