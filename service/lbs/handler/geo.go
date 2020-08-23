@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	mongoProxy "traffic-dispatcher/dbproxy/mongo"
+	mongoProxy "traffic-dispatcher/db/mongo"
 	"traffic-dispatcher/model"
 	"traffic-dispatcher/proto/geo"
 

@@ -1,4 +1,4 @@
-package dbproxy
+package db
 
 import (
 	"log"
@@ -8,6 +8,7 @@ import (
 	// mysql
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
+	"traffic-dispatcher/config"
 	"traffic-dispatcher/model/orm"
 )
 
@@ -15,7 +16,7 @@ var dbCli *gorm.DB
 
 func init() {
 	var err error
-	dbCli, err = gorm.Open("mysql", "admin:admin^2020@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=utf8&parseTime=True&loc=Local")
+	dbCli, err = gorm.Open("mysql", config.MySQLSource)
 	// defer db.Close()
 	if err != nil {
 		log.Printf("connect mysql error: %s", err.Error())

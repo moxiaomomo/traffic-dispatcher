@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"strconv"
-	"traffic-dispatcher/dbproxy"
+	dbproxy "traffic-dispatcher/db"
 	"traffic-dispatcher/model/orm"
 
 	"github.com/micro/go-micro/v2/logger"

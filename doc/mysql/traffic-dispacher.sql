@@ -1,5 +1,5 @@
 create database `traffic-dispatcher` default character set utf8;
--- grant all privileges on `traffic-dispatcher`.* to 'admin'@'%' identified by 'admin^2020';
+-- grant all privileges on `traffic-dispatcher`.* to 'admin'@'%' identified by 'test123456';
 -- flush privileges;
 use traffic-dispatcher;
 
