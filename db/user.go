@@ -56,11 +56,13 @@ func Signin(user *orm.User) (dbUser orm.User, err error) {
 		return
 	}
 
+	dbUser.Token = genToken(&dbUser)
+
 	rConn := dbredis.Conn()
 	defer rConn.Close()
 
 	hKey := genSessionID(&dbUser)
-	rConn.Do("HSET", hKey, "token", genToken(&dbUser))
+	rConn.Do("HSET", hKey, "token", dbUser.Token)
 	rConn.Do("EXPIRE", hKey, 43200) // 12h
 	return
 }

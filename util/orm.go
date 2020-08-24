@@ -20,6 +20,7 @@ func OrmUser2ProtoUser(user *orm.User) *userProto.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int32(user.Status),
+		Token:          user.Token,
 	}
 	if user.SignupAt != nil {
 		tmp.SignupAt = uint64(user.SignupAt.Unix())
@@ -44,6 +45,7 @@ func ProtoUser2OrmUser(user *userProto.User) *orm.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int(user.Status),
+		Token:          user.Token,
 	}
 	if user.SignupAt > 0 {
 		signupAt := time.Unix(int64(user.SignupAt), 0)

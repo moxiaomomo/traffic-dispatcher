@@ -26,6 +26,7 @@ message user {
   uint64 lastActive = 11;
   string profile = 12;
   int32 status = 13;
+  string token = 14;
 }
 
 message ReqSignup {
