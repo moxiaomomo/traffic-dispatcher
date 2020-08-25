@@ -6,6 +6,7 @@ hello
 lbs
 passenger
 user
+order
 "
 
 for proto in $protos
