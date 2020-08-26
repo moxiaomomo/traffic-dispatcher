@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+// package go.micro.srv.order;
+option go_package = ".;order";
+
+service Order {
+  // 创建出行订单
+  rpc CreateOrder(ReqCreateOrder) returns (RespCreateOrder) {}
+}
+
+message order {
+  int64 id = 1;
+  string orderId = 2;
+  string srcGeo = 3;
+  string destGeo = 4;
+  int64 createAt = 5;
+  int64 cancelAt = 6;
+  int64 finishAt = 7;
+  int32 cancelRole = 8;
+  double cost = 9;
+  string passengerId = 10;
+  string driverId = 11;
+  int32 status = 12;
+}
+
+message ReqCreateOrder {
+  order order = 1;
+  string sign = 2;
+}
+
+message RespCreateOrder {
+  int32 code = 1;
+  order order = 2;
+  string message = 3;
+}

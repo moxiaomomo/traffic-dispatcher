@@ -3,6 +3,7 @@ package util
 import (
 	"time"
 	"traffic-dispatcher/model/orm"
+	orderProto "traffic-dispatcher/proto/order"
 	userProto "traffic-dispatcher/proto/user"
 )
 
@@ -20,6 +21,7 @@ func OrmUser2ProtoUser(user *orm.User) *userProto.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int32(user.Status),
+		Token:          user.Token,
 	}
 	if user.SignupAt != nil {
 		tmp.SignupAt = uint64(user.SignupAt.Unix())
@@ -44,6 +46,7 @@ func ProtoUser2OrmUser(user *userProto.User) *orm.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int(user.Status),
+		Token:          user.Token,
 	}
 	if user.SignupAt > 0 {
 		signupAt := time.Unix(int64(user.SignupAt), 0)
@@ -52,6 +55,59 @@ func ProtoUser2OrmUser(user *userProto.User) *orm.User {
 	if user.LastActive > 0 {
 		lastActive := time.Unix(int64(user.LastActive), 0)
 		tmp.LastActive = &lastActive
+	}
+	return &tmp
+}
+
+// OrmOrder2ProtoOrder orm order to proto order
+func OrmOrder2ProtoOrder(order *orm.Order) *orderProto.Order {
+	tmp := orderProto.Order{
+		Id:          int64(order.Id),
+		OrderId:     order.OrderId,
+		SrcGeo:      order.SrcGeo,
+		DestGeo:     order.DestGeo,
+		CancelRole:  order.CancelRole,
+		Cost:        order.Cost,
+		PassengerId: order.PassengerId,
+		DriverId:    order.DriverId,
+		Status:      order.Status,
+	}
+	if order.CreateAt != nil {
+		tmp.CreateAt = order.CreateAt.Unix()
+	}
+	if order.CancelAt != nil {
+		tmp.CancelAt = order.CancelAt.Unix()
+	}
+	if order.FinishAt != nil {
+		tmp.FinishAt = order.FinishAt.Unix()
+	}
+	return &tmp
+}
+
+// ProtoOrder2OrmOrder proto order to orm proto
+func ProtoOrder2OrmOrder(order *orderProto.Order) *orm.Order {
+	tmp := orm.Order{
+		Id:          uint(order.Id),
+		OrderId:     order.OrderId,
+		SrcGeo:      order.SrcGeo,
+		DestGeo:     order.DestGeo,
+		CancelRole:  order.CancelRole,
+		Cost:        order.Cost,
+		PassengerId: order.PassengerId,
+		DriverId:    order.DriverId,
+		Status:      order.Status,
+	}
+	if order.CreateAt > 0 {
+		createAt := time.Unix(order.CreateAt, 0)
+		tmp.CreateAt = &createAt
+	}
+	if order.CancelAt > 0 {
+		cancelAt := time.Unix(order.CancelAt, 0)
+		tmp.CancelAt = &cancelAt
+	}
+	if order.FinishAt > 0 {
+		finishAt := time.Unix(order.FinishAt, 0)
+		tmp.FinishAt = &finishAt
 	}
 	return &tmp
 }

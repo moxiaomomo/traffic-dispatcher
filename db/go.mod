@@ -13,6 +13,7 @@ require (
 	traffic-dispatcher/model v1.0.0
 	traffic-dispatcher/db v1.0.0
 	traffic-dispatcher/util v1.0.0
+  traffic-dispatcher/proto v1.0.0
 )
 
 replace traffic-dispatcher/model => ../model
@@ -22,3 +23,5 @@ replace traffic-dispatcher/config => ../config
 replace traffic-dispatcher/util => ../util
 
 replace traffic-dispatcher/db => ../db
+
+replace traffic-dispatcher/proto => ../proto

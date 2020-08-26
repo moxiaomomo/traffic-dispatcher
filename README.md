@@ -24,8 +24,17 @@
 - Protobuf (V3)
 - Docker (部署微服务等)
 
-(前端测试) [web_admin](https://github.com/moxiaomomo/traffic-dispatcher-admin)
+(前端测试)
 
+[web_admin](https://github.com/moxiaomomo/traffic-dispatcher-admin)
+
+- Vue 2.x
+- Baidu map API
+- Typescript 3.x
+
+[app_test](https://github.com/moxiaomomo/traffic-dispatcher-cli)
+
+- uni-app
 - Vue 2.x
 - Baidu map API
 - Typescript 3.x
@@ -40,7 +49,7 @@
 - dispatcher 派遣调度服务 (默认端口：18004)
 - notification 全局消息服务 (默认端口：18005)
 
-## 编译
+### 编译
 
 - 编译 proto
 
@@ -58,6 +67,8 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 # --registry_address 按实际情况修改
 # 启动 user backend service
 go run service/user/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# 启动 order backend service
+go run service/order/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 driver api service
 go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 passenger api service
@@ -65,10 +76,12 @@ go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
 # 测试
-curl -X POST "http://localhost:8080/passenger/user/signup" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"xxyytt"}'
+curl -X POST "http://localhost:8080/passenger/user/signup" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"123456"}'
 # {"code":1,"msg":"Signup succeeded."}
-curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"xxyytt"}'
-# {"code":1,"msg":"Signin succeeded.","user":{"id":3,"userID":"8008b64187fea0465e72aeb76a01dc49","userName":"xiaomo","userPwd":"xxyytt"}}
+curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"123456"}'
+# {"code":1,"msg":"Signin succeeded.","user":{"id":3,"userID":"8008b64187fea0465e72aeb76a01dc49","userName":"xiaomo","userPwd":"123456"}}
+curl -X POST "http://localhost:8080/passenger/order/createOrder" -H "content-type:application/json" -d '{"srcGeo":"[110,26]","destGeo":"[112,30]","passengerId":"97d09d9efec8df12cfd093a79599efff"}'
+# {"code":10000,"msg":"","order":{"id":1,"orderId":"f137df8a1f5b00b1f1ef037045051fbf","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598457938,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
 ```
 
 - 测试 websocket 传输

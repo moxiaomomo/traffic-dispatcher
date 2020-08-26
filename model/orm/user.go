@@ -32,4 +32,7 @@ type User struct {
 	Profile string
 	// 状态
 	Status int
+
+	// extra
+	Token string
 }

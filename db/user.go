@@ -42,6 +42,11 @@ func Signup(user *orm.User) error {
 
 // Signin 用户登录
 func Signin(user *orm.User) (dbUser orm.User, err error) {
+	if user.UserPwd == "" || user.UserName == "" {
+		err = errors.New("Invalid user request")
+		return
+	}
+
 	dbmysql.Conn().Where("user_name = ?", user.UserName).First(&dbUser)
 	if dbUser.UserName != user.UserName {
 		err = errors.New("No user matched")
@@ -51,11 +56,13 @@ func Signin(user *orm.User) (dbUser orm.User, err error) {
 		return
 	}
 
+	dbUser.Token = genToken(&dbUser)
+
 	rConn := dbredis.Conn()
 	defer rConn.Close()
 
 	hKey := genSessionID(&dbUser)
-	rConn.Do("HSET", hKey, "token", genToken(&dbUser))
+	rConn.Do("HSET", hKey, "token", dbUser.Token)
 	rConn.Do("EXPIRE", hKey, 43200) // 12h
 	return
 }

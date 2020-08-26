@@ -4,7 +4,7 @@ import (
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/logger"
 
-	hello "traffic-dispatcher/proto/hello"
+	order "traffic-dispatcher/proto/order"
 	"traffic-dispatcher/service/order/handler"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	service.Init()
 
 	// Register Handler
-	hello.RegisterSayHandler(service.Server(), new(handler.Order))
+	order.RegisterOrderHandler(service.Server(), new(handler.Order))
 
 	// Run service
 	if err := service.Run(); err != nil {

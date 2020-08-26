@@ -26,6 +26,22 @@ const (
 	ClientAdmin
 )
 
+// OrderState 订单状态
+type OrderState int
+
+const (
+	// OrderCreated 订单创建
+	OrderCreated OrderState = iota
+	// OrderAccepted 订单接受
+	OrderAccepted
+	// OrderProcessing 订单进行中
+	OrderProcessing
+	// OrderCanceled 订单取消
+	OrderCanceled
+	// OrderFinishde 订单完成
+	OrderFinishde
+)
+
 // User 用户client
 type User struct {
 	Name  string `json:"name"`
