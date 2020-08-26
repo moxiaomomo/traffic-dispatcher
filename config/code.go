@@ -4,7 +4,7 @@ package config
 type ErrorCode int32
 
 const (
-	_ int32 = iota + 9999
+	_ ErrorCode = iota + 9999
 	// StatusOK : 正常
 	StatusOK
 	// StatusParamInvalid : 请求参数无效

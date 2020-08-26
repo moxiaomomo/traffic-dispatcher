@@ -2,6 +2,7 @@ package main
 
 import (
 	"traffic-dispatcher/api/passenger/handler"
+	order "traffic-dispatcher/proto/order"
 	user "traffic-dispatcher/proto/user"
 
 	"github.com/micro/go-micro/v2"
@@ -19,9 +20,19 @@ func main() {
 
 	service.Init()
 
+	// 处理user/处理order service
 	service.Server().Handle(
 		service.Server().NewHandler(
-			&handler.User{Client: user.NewUserService("go.micro.srv.user", service.Client())},
+			&handler.User{
+				Client: user.NewUserService("go.micro.srv.user", service.Client()),
+			},
+		),
+	)
+	service.Server().Handle(
+		service.Server().NewHandler(
+			&handler.Order{
+				Client: order.NewOrderService("go.micro.srv.order", service.Client()),
+			},
 		),
 	)
 

@@ -20,10 +20,8 @@ func genOrderID(order *orm.Order) string {
 }
 
 // CreateOrder 创建订单
-func CreateOrder(order *orm.Order) error {
+func CreateOrder(order *orm.Order) (*orm.Order, error) {
 	order.OrderId = genOrderID(order)
-	if err := dbmysql.Conn().Create(order).Error; err != nil {
-		return err
-	}
-	return nil
+	err := dbmysql.Conn().Create(order).Error
+	return order, err
 }

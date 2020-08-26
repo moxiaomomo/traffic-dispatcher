@@ -67,6 +67,8 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 # --registry_address 按实际情况修改
 # 启动 user backend service
 go run service/user/main.go --registry=etcd --registry_address=172.30.0.10:2379
+# 启动 order backend service
+go run service/order/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 driver api service
 go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 passenger api service
@@ -78,6 +80,8 @@ curl -X POST "http://localhost:8080/passenger/user/signup" -H "content-type:appl
 # {"code":1,"msg":"Signup succeeded."}
 curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"123456"}'
 # {"code":1,"msg":"Signin succeeded.","user":{"id":3,"userID":"8008b64187fea0465e72aeb76a01dc49","userName":"xiaomo","userPwd":"123456"}}
+curl -X POST "http://localhost:8080/passenger/order/createOrder" -H "content-type:application/json" -d '{"srcGeo":"[110,26]","destGeo":"[112,30]","passengerId":"97d09d9efec8df12cfd093a79599efff"}'
+# {"code":10000,"msg":"","order":{"id":1,"orderId":"f137df8a1f5b00b1f1ef037045051fbf","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598457938,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
 ```
 
 - 测试 websocket 传输

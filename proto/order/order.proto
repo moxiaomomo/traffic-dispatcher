@@ -13,11 +13,11 @@ message order {
   string orderId = 2;
   string srcGeo = 3;
   string destGeo = 4;
-  uint64 createAt = 5;
-  uint64 cancelAt = 6;
-  uint64 finishAt = 7;
+  int64 createAt = 5;
+  int64 cancelAt = 6;
+  int64 finishAt = 7;
   int32 cancelRole = 8;
-  uint64 cost = 9;
+  double cost = 9;
   string passengerId = 10;
   string driverId = 11;
   int32 status = 12;
