@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -22,6 +23,24 @@ func genOrderID(order *orm.Order) string {
 // CreateOrder 创建订单
 func CreateOrder(order *orm.Order) (*orm.Order, error) {
 	order.OrderId = genOrderID(order)
+	// order.Status = int32(model.OrderCreated)
 	err := dbmysql.Conn().Create(order).Error
+	return order, err
+}
+
+// AcceptOrder 接收订单
+func AcceptOrder(order *orm.Order) (*orm.Order, error) {
+	if order.OrderId == "" || order.DriverId == "" {
+		return nil, errors.New("Invalid order to accept")
+	}
+
+	// 更新指定字段
+	err := dbmysql.Conn().Model(&order).Where("order_id = ?", order.OrderId).Updates(
+		orm.Order{
+			AcceptAt: order.AcceptAt,
+			DriverId: order.DriverId,
+			Status:   order.Status,
+		},
+	).Error
 	return order, err
 }

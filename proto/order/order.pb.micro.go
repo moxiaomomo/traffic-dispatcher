@@ -44,6 +44,8 @@ func NewOrderEndpoints() []*api.Endpoint {
 type OrderService interface {
 	// 创建出行订单
 	CreateOrder(ctx context.Context, in *ReqCreateOrder, opts ...client.CallOption) (*RespCreateOrder, error)
+	// 接受订单 / 抢单
+	AcceptOrder(ctx context.Context, in *ReqAcceptOrder, opts ...client.CallOption) (*RespAcceptOrder, error)
 }
 
 type orderService struct {
@@ -68,16 +70,29 @@ func (c *orderService) CreateOrder(ctx context.Context, in *ReqCreateOrder, opts
 	return out, nil
 }
 
+func (c *orderService) AcceptOrder(ctx context.Context, in *ReqAcceptOrder, opts ...client.CallOption) (*RespAcceptOrder, error) {
+	req := c.c.NewRequest(c.name, "Order.AcceptOrder", in)
+	out := new(RespAcceptOrder)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Order service
 
 type OrderHandler interface {
 	// 创建出行订单
 	CreateOrder(context.Context, *ReqCreateOrder, *RespCreateOrder) error
+	// 接受订单 / 抢单
+	AcceptOrder(context.Context, *ReqAcceptOrder, *RespAcceptOrder) error
 }
 
 func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.HandlerOption) error {
 	type order interface {
 		CreateOrder(ctx context.Context, in *ReqCreateOrder, out *RespCreateOrder) error
+		AcceptOrder(ctx context.Context, in *ReqAcceptOrder, out *RespAcceptOrder) error
 	}
 	type Order struct {
 		order
@@ -92,4 +107,8 @@ type orderHandler struct {
 
 func (h *orderHandler) CreateOrder(ctx context.Context, in *ReqCreateOrder, out *RespCreateOrder) error {
 	return h.OrderHandler.CreateOrder(ctx, in, out)
+}
+
+func (h *orderHandler) AcceptOrder(ctx context.Context, in *ReqAcceptOrder, out *RespAcceptOrder) error {
+	return h.OrderHandler.AcceptOrder(ctx, in, out)
 }

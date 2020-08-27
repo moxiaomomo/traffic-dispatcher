@@ -41,7 +41,7 @@ func Signup(user *orm.User) error {
 }
 
 // Signin 用户登录
-func Signin(user *orm.User) (dbUser orm.User, err error) {
+func Signin(user *orm.User) (dbUser orm.User, token string, err error) {
 	if user.UserPwd == "" || user.UserName == "" {
 		err = errors.New("Invalid user request")
 		return
@@ -56,13 +56,13 @@ func Signin(user *orm.User) (dbUser orm.User, err error) {
 		return
 	}
 
-	dbUser.Token = genToken(&dbUser)
+	token = genToken(&dbUser)
 
 	rConn := dbredis.Conn()
 	defer rConn.Close()
 
 	hKey := genSessionID(&dbUser)
-	rConn.Do("HSET", hKey, "token", dbUser.Token)
+	rConn.Do("HSET", hKey, "token", token)
 	rConn.Do("EXPIRE", hKey, 43200) // 12h
 	return
 }

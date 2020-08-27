@@ -97,13 +97,13 @@ Broker rabbitmq not found
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 ```
 
-- 其他常见issue
+- 其他常见 issue
 
 ```
 // error during request: unknown field \"name\" in go_api.Request
 Error with Micro-Go-API #286: https://github.com/micro/micro/issues/286
 
-// micro api --handler=api 
+// micro api --handler=api
 https://github.com/micro/micro/issues/944
 https://github.com/micro/micro/issues/929
 ```
@@ -120,4 +120,10 @@ panic: proto: duplicate proto message registered: go.micro.broker.Message.Header
 // 修改
 // 	"github.com/micro/go-micro/v2/client"
 driverCli = driver.NewDriverSrvService("go.micro.api.driver", client.DefaultClient)
+```
+
+- gorm 查询数据库时， 值为 0 的字段会直接被忽略，无法写入结构体中
+
+```
+未解
 ```
