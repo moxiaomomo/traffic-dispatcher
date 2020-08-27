@@ -21,7 +21,7 @@ func OrmUser2ProtoUser(user *orm.User) *userProto.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int32(user.Status),
-		Token:          user.Token,
+		// Token:          user.Token,
 	}
 	if user.SignupAt != nil {
 		tmp.SignupAt = uint64(user.SignupAt.Unix())
@@ -46,7 +46,7 @@ func ProtoUser2OrmUser(user *userProto.User) *orm.User {
 		PhoneValidated: user.PhoneValidated,
 		Profile:        user.Profile,
 		Status:         int(user.Status),
-		Token:          user.Token,
+		// Token:          user.Token,
 	}
 	if user.SignupAt > 0 {
 		signupAt := time.Unix(int64(user.SignupAt), 0)
@@ -75,6 +75,9 @@ func OrmOrder2ProtoOrder(order *orm.Order) *orderProto.Order {
 	if order.CreateAt != nil {
 		tmp.CreateAt = order.CreateAt.Unix()
 	}
+	if order.AcceptAt != nil {
+		tmp.AcceptAt = order.AcceptAt.Unix()
+	}
 	if order.CancelAt != nil {
 		tmp.CancelAt = order.CancelAt.Unix()
 	}
@@ -100,6 +103,10 @@ func ProtoOrder2OrmOrder(order *orderProto.Order) *orm.Order {
 	if order.CreateAt > 0 {
 		createAt := time.Unix(order.CreateAt, 0)
 		tmp.CreateAt = &createAt
+	}
+	if order.AcceptAt > 0 {
+		acceptAt := time.Unix(order.AcceptAt, 0)
+		tmp.AcceptAt = &acceptAt
 	}
 	if order.CancelAt > 0 {
 		cancelAt := time.Unix(order.CancelAt, 0)

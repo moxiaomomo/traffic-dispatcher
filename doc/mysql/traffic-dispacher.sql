@@ -31,6 +31,7 @@ CREATE TABLE `tbl_order` (
   `src_geo` varchar(32) NOT NULL DEFAULT '' COMMENT '起始位置',
   `dest_geo` varchar(32) NOT NULL DEFAULT '' COMMENT '目标位置',
   `create_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建日期',
+  `accept_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单accept日期',
   `cancel_at` datetime COMMENT '订单取消日期',
   `finish_at` datetime COMMENT '订单完成日期',
   `cancel_role` int(11) DEFAULT -1 COMMENT '取消订单的角色,0:passenger,1:driver',

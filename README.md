@@ -76,12 +76,24 @@ go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
 # 测试
+
+## signup
 curl -X POST "http://localhost:8080/passenger/user/signup" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"123456"}'
 # {"code":1,"msg":"Signup succeeded."}
+curl -X POST "http://localhost:8080/driver/user/signup" -H "content-type:application/json" -d '{"role":1,"userName":"xiaohua","userPwd":"123456"}'
+# {"code":1,"msg":"Signup succeeded."}
+
+## signin
 curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaomo","userPwd":"123456"}'
-# {"code":1,"msg":"Signin succeeded.","user":{"id":3,"userID":"8008b64187fea0465e72aeb76a01dc49","userName":"xiaomo","userPwd":"123456"}}
+# {"code":1,"msg":"Signin succeeded.","user":{"id":6,"userID":"97d09d9efec8df12cfd093a79599efff","userName":"xiaomo","userPwd":"123456","lastActive":18446744011573954816,"token":"a3170402fa50535a38fe1a63aff749335f47d8fa"}}
+curl -X POST "http://localhost:8080/driver/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaohua","userPwd":"123456"}'
+# {"code":1,"msg":"Signin succeeded.","user":{"id":7,"role":1,"userID":"8c920cfdf46bdcc7744335e44684e594","userName":"xiaohua","userPwd":"123456","token":"c009573d73644d81e126668527ef05f65f47d8d8"}}
+
+## create and accept order
 curl -X POST "http://localhost:8080/passenger/order/createOrder" -H "content-type:application/json" -d '{"srcGeo":"[110,26]","destGeo":"[112,30]","passengerId":"97d09d9efec8df12cfd093a79599efff"}'
-# {"code":10000,"msg":"","order":{"id":1,"orderId":"f137df8a1f5b00b1f1ef037045051fbf","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598457938,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
+# {{"code":10000,"msg":"","order":{"id":2,"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598544547,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
+curl -X POST "http://localhost:8080/driver/order/acceptOrder" -H "content-type:application/json" -d '{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","driverId":"8c920cfdf46bdcc7744335e44684e594"}'
+# {"code":10000,"msg":"","order":{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","acceptAt":1598544858,"driverId":"8c920cfdf46bdcc7744335e44684e594","status":1}}
 ```
 
 - 测试 websocket 传输

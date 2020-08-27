@@ -33,6 +33,6 @@ type User struct {
 	// 状态
 	Status int
 
-	// extra
-	Token string
+	// // extra
+	// Token string
 }

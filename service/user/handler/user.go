@@ -40,10 +40,11 @@ func (e *User) Signin(ctx context.Context, req *user.ReqSignin, rsp *user.RespSi
 	logger.Infof("user signin: %s\n", req.User.GetUserName())
 
 	dbUser := util.ProtoUser2OrmUser(req.User)
-	rspUser, err := dbproxy.Signin(dbUser)
+	rspUser, token, err := dbproxy.Signin(dbUser)
 	if err == nil {
 		rsp.Code = 1
 		pUser := util.OrmUser2ProtoUser(&rspUser)
+		pUser.Token = token
 		rsp.User = pUser
 		rsp.Message = "Signin succeeded."
 	} else {
