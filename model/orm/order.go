@@ -25,11 +25,11 @@ type Order struct {
 	// CancelRole 发起取消操作的角色
 	CancelRole int32
 	// Cost 订单交易价格
-	Cost float64
+	Cost float64 `gorm:"default:0"`
 	// PassengerId 乘客Id
 	PassengerId string
 	// DriverId 司机Id
 	DriverId string
 	// Status 订单状态
-	Status int32
+	Status int32 `gorm:"default:0"`
 }

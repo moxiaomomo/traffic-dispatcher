@@ -9,15 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/util/log"
 
-	wsconn "traffic-dispatcher/connection"
 	"traffic-dispatcher/model"
-	geoProto "traffic-dispatcher/proto/geo"
+	wsconn "traffic-dispatcher/net"
+	lbsProto "traffic-dispatcher/proto/lbs"
 )
 
 // 上报坐标位置
 func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 
-	if rsp, err := GeoCli.ReportGeo(context.TODO(), &geoProto.ReportRequest{
+	if rsp, err := GeoCli.ReportGeo(context.TODO(), &lbsProto.ReportRequest{
 		Name: "ReportGeoInfo",
 		Data: data,
 	}); err == nil {
@@ -29,7 +29,7 @@ func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 
 // 搜索附近坐标位置
 func queryGeoInfo(cliRole model.ClientRole, data []byte) {
-	if rsp, err := GeoCli.QueryGeo(context.TODO(), &geoProto.QueryRequest{
+	if rsp, err := GeoCli.QueryGeoNearby(context.TODO(), &lbsProto.QueryRequest{
 		Name: "QueryGeoInfo",
 		Data: data,
 	}); err == nil {
