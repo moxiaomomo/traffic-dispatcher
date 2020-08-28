@@ -67,14 +67,22 @@ protoc --proto_path=. --micro_out=./proto/geo/ --go_out=./proto/geo/ proto/geo/g
 # --registry_address 按实际情况修改
 # 启动 user backend service
 go run service/user/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
 # 启动 order backend service
 go run service/order/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
+# 启动 lbs backend service
+go run service/lbs/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
 # 启动 driver api service
 go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
 # 启动 passenger api service
 go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
+
 # 测试
 
 ## signup
@@ -94,6 +102,10 @@ curl -X POST "http://localhost:8080/passenger/order/createOrder" -H "content-typ
 # {{"code":10000,"msg":"","order":{"id":2,"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598544547,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
 curl -X POST "http://localhost:8080/driver/order/acceptOrder" -H "content-type:application/json" -d '{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","driverId":"8c920cfdf46bdcc7744335e44684e594"}'
 # {"code":10000,"msg":"","order":{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","acceptAt":1598544858,"driverId":"8c920cfdf46bdcc7744335e44684e594","status":1}}
+
+## query geo nearby
+curl -X POST "http://localhost:8080/passenger/lbs/queryGeoNearby" -H "content-type:application/json" -d '{"geo":{"lat":26,"lng":110},"role":1}'
+# {"code":0,"data":"bnVsbA==","msg":"Hi "} ## TODO should be updated
 ```
 
 - 测试 websocket 传输

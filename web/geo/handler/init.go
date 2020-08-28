@@ -1,17 +1,17 @@
 package handler
 
 import (
-	wsconn "traffic-dispatcher/connection"
-	"traffic-dispatcher/proto/geo"
+	wsnet "traffic-dispatcher/net"
+	"traffic-dispatcher/proto/lbs"
 
 	"github.com/gorilla/websocket"
 )
 
 var (
 	wsConn      *websocket.Conn
-	conn        *wsconn.WsConnection
+	conn        *wsnet.WsConnection
 	wsConnCount int
-	GeoCli      geo.GeoLocationService
+	GeoCli      lbs.GeoLocationService
 )
 
 type GeoLocation struct {

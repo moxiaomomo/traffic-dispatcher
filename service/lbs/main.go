@@ -1,7 +1,7 @@
 package main
 
 import (
-	geo "traffic-dispatcher/proto/geo"
+	lbs "traffic-dispatcher/proto/lbs"
 	"traffic-dispatcher/service/lbs/handler"
 
 	"github.com/micro/go-micro/v2"
@@ -19,7 +19,7 @@ func main() {
 	service.Init()
 
 	// Register Handler
-	geo.RegisterGeoLocationHandler(service.Server(), new(handler.GeoLocation))
+	lbs.RegisterGeoLocationHandler(service.Server(), new(handler.GeoLocation))
 
 	// Run service
 	if err := service.Run(); err != nil {

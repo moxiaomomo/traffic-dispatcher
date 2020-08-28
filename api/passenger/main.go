@@ -2,6 +2,7 @@ package main
 
 import (
 	"traffic-dispatcher/api/passenger/handler"
+	lbs "traffic-dispatcher/proto/lbs"
 	order "traffic-dispatcher/proto/order"
 	user "traffic-dispatcher/proto/user"
 
@@ -32,6 +33,13 @@ func main() {
 		service.Server().NewHandler(
 			&handler.Order{
 				Client: order.NewOrderService("go.micro.srv.order", service.Client()),
+			},
+		),
+	)
+	service.Server().Handle(
+		service.Server().NewHandler(
+			&handler.Lbs{
+				Client: lbs.NewGeoLocationService("go.micro.srv.lbs", service.Client()),
 			},
 		),
 	)

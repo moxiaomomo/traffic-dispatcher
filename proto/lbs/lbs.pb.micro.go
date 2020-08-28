@@ -33,35 +33,34 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
-// Api Endpoints for Lbs service
+// Api Endpoints for GeoLocation service
 
-func NewLbsEndpoints() []*api.Endpoint {
+func NewGeoLocationEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{}
 }
 
-// Client API for Lbs service
+// Client API for GeoLocation service
 
-type LbsService interface {
-	Call(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
-	Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (Lbs_StreamService, error)
-	PingPong(ctx context.Context, opts ...client.CallOption) (Lbs_PingPongService, error)
+type GeoLocationService interface {
+	ReportGeo(ctx context.Context, in *ReportRequest, opts ...client.CallOption) (*ReportResponse, error)
+	QueryGeoNearby(ctx context.Context, in *QueryRequest, opts ...client.CallOption) (*QueryResponse, error)
 }
 
-type lbsService struct {
+type geoLocationService struct {
 	c    client.Client
 	name string
 }
 
-func NewLbsService(name string, c client.Client) LbsService {
-	return &lbsService{
+func NewGeoLocationService(name string, c client.Client) GeoLocationService {
+	return &geoLocationService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *lbsService) Call(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "Lbs.Call", in)
-	out := new(Response)
+func (c *geoLocationService) ReportGeo(ctx context.Context, in *ReportRequest, opts ...client.CallOption) (*ReportResponse, error) {
+	req := c.c.NewRequest(c.name, "GeoLocation.ReportGeo", in)
+	out := new(ReportResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -69,216 +68,43 @@ func (c *lbsService) Call(ctx context.Context, in *Request, opts ...client.CallO
 	return out, nil
 }
 
-func (c *lbsService) Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (Lbs_StreamService, error) {
-	req := c.c.NewRequest(c.name, "Lbs.Stream", &StreamingRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *geoLocationService) QueryGeoNearby(ctx context.Context, in *QueryRequest, opts ...client.CallOption) (*QueryResponse, error) {
+	req := c.c.NewRequest(c.name, "GeoLocation.QueryGeoNearby", in)
+	out := new(QueryResponse)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
+	return out, nil
+}
+
+// Server API for GeoLocation service
+
+type GeoLocationHandler interface {
+	ReportGeo(context.Context, *ReportRequest, *ReportResponse) error
+	QueryGeoNearby(context.Context, *QueryRequest, *QueryResponse) error
+}
+
+func RegisterGeoLocationHandler(s server.Server, hdlr GeoLocationHandler, opts ...server.HandlerOption) error {
+	type geoLocation interface {
+		ReportGeo(ctx context.Context, in *ReportRequest, out *ReportResponse) error
+		QueryGeoNearby(ctx context.Context, in *QueryRequest, out *QueryResponse) error
 	}
-	return &lbsServiceStream{stream}, nil
-}
-
-type Lbs_StreamService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*StreamingResponse, error)
-}
-
-type lbsServiceStream struct {
-	stream client.Stream
-}
-
-func (x *lbsServiceStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *lbsServiceStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *lbsServiceStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsServiceStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *lbsServiceStream) Recv() (*StreamingResponse, error) {
-	m := new(StreamingResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
+	type GeoLocation struct {
+		geoLocation
 	}
-	return m, nil
+	h := &geoLocationHandler{hdlr}
+	return s.Handle(s.NewHandler(&GeoLocation{h}, opts...))
 }
 
-func (c *lbsService) PingPong(ctx context.Context, opts ...client.CallOption) (Lbs_PingPongService, error) {
-	req := c.c.NewRequest(c.name, "Lbs.PingPong", &Ping{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &lbsServicePingPong{stream}, nil
+type geoLocationHandler struct {
+	GeoLocationHandler
 }
 
-type Lbs_PingPongService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Ping) error
-	Recv() (*Pong, error)
+func (h *geoLocationHandler) ReportGeo(ctx context.Context, in *ReportRequest, out *ReportResponse) error {
+	return h.GeoLocationHandler.ReportGeo(ctx, in, out)
 }
 
-type lbsServicePingPong struct {
-	stream client.Stream
-}
-
-func (x *lbsServicePingPong) Close() error {
-	return x.stream.Close()
-}
-
-func (x *lbsServicePingPong) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *lbsServicePingPong) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsServicePingPong) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *lbsServicePingPong) Send(m *Ping) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsServicePingPong) Recv() (*Pong, error) {
-	m := new(Pong)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// Server API for Lbs service
-
-type LbsHandler interface {
-	Call(context.Context, *Request, *Response) error
-	Stream(context.Context, *StreamingRequest, Lbs_StreamStream) error
-	PingPong(context.Context, Lbs_PingPongStream) error
-}
-
-func RegisterLbsHandler(s server.Server, hdlr LbsHandler, opts ...server.HandlerOption) error {
-	type lbs interface {
-		Call(ctx context.Context, in *Request, out *Response) error
-		Stream(ctx context.Context, stream server.Stream) error
-		PingPong(ctx context.Context, stream server.Stream) error
-	}
-	type Lbs struct {
-		lbs
-	}
-	h := &lbsHandler{hdlr}
-	return s.Handle(s.NewHandler(&Lbs{h}, opts...))
-}
-
-type lbsHandler struct {
-	LbsHandler
-}
-
-func (h *lbsHandler) Call(ctx context.Context, in *Request, out *Response) error {
-	return h.LbsHandler.Call(ctx, in, out)
-}
-
-func (h *lbsHandler) Stream(ctx context.Context, stream server.Stream) error {
-	m := new(StreamingRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.LbsHandler.Stream(ctx, m, &lbsStreamStream{stream})
-}
-
-type Lbs_StreamStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*StreamingResponse) error
-}
-
-type lbsStreamStream struct {
-	stream server.Stream
-}
-
-func (x *lbsStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *lbsStreamStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *lbsStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *lbsStreamStream) Send(m *StreamingResponse) error {
-	return x.stream.Send(m)
-}
-
-func (h *lbsHandler) PingPong(ctx context.Context, stream server.Stream) error {
-	return h.LbsHandler.PingPong(ctx, &lbsPingPongStream{stream})
-}
-
-type Lbs_PingPongStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Pong) error
-	Recv() (*Ping, error)
-}
-
-type lbsPingPongStream struct {
-	stream server.Stream
-}
-
-func (x *lbsPingPongStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *lbsPingPongStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *lbsPingPongStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsPingPongStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *lbsPingPongStream) Send(m *Pong) error {
-	return x.stream.Send(m)
-}
-
-func (x *lbsPingPongStream) Recv() (*Ping, error) {
-	m := new(Ping)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *geoLocationHandler) QueryGeoNearby(ctx context.Context, in *QueryRequest, out *QueryResponse) error {
+	return h.GeoLocationHandler.QueryGeoNearby(ctx, in, out)
 }

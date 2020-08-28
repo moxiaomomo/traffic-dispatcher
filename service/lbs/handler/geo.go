@@ -7,7 +7,7 @@ import (
 
 	mongoProxy "traffic-dispatcher/db/mongo"
 	"traffic-dispatcher/model"
-	"traffic-dispatcher/proto/geo"
+	"traffic-dispatcher/proto/lbs"
 
 	"github.com/micro/go-micro/v2/util/log"
 	h3 "github.com/uber/h3-go/v3"
@@ -15,6 +15,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+type GeoLocation struct{}
 
 var clientDBMap = map[model.ClientRole]string{
 	model.ClientDriver:    "driverInfo",
@@ -94,9 +96,7 @@ func QueryGeo(lat float64, lng float64, role model.ClientRole) (res []model.User
 	return
 }
 
-type GeoLocation struct{}
-
-func (g *GeoLocation) ReportGeo(ctx context.Context, req *geo.ReportRequest, resp *geo.ReportResponse) error {
+func (g *GeoLocation) ReportGeo(ctx context.Context, req *lbs.ReportRequest, resp *lbs.ReportResponse) error {
 	var data model.WSMessage
 	if err := json.Unmarshal(req.Data, &data); err == nil {
 		InsertGeo(7, data)
@@ -108,7 +108,7 @@ func (g *GeoLocation) ReportGeo(ctx context.Context, req *geo.ReportRequest, res
 	}
 }
 
-func (g *GeoLocation) QueryGeo(ctx context.Context, req *geo.QueryRequest, resp *geo.QueryResponse) error {
+func (g *GeoLocation) QueryGeoNearby(ctx context.Context, req *lbs.QueryRequest, resp *lbs.QueryResponse) error {
 	var data model.WSMessage
 	var err error
 	if err = json.Unmarshal(req.Data, &data); err == nil {

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 protos="
-geo
 hello
 lbs
 passenger

@@ -9,7 +9,7 @@ type User struct {
 	// 用户id
 	Id uint
 	// 用户角色
-	Role int
+	Role int `gorm:"default:0"`
 	// 用户id
 	UserId string
 	// 用户名
