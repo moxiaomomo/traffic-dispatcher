@@ -17,4 +17,7 @@ const (
 
 	// RedisSessionPrefix 用户登录session信息
 	RedisSessionPrefix = "SESSION_"
+
+	// LbsMQTopic broker topic
+	LbsMQTopic = "lbs.dispatcher.task"
 )
