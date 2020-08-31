@@ -18,6 +18,8 @@ const (
 	// RedisSessionPrefix 用户登录session信息
 	RedisSessionPrefix = "SESSION_"
 
-	// LbsMQTopic broker topic
-	LbsMQTopic = "lbs.dispatcher.task"
+	// DriverLbsMQTopic broker topic
+	DriverLbsMQTopic = "lbs.dispatcher.driver"
+	// PassengerLbsMQTopic broker topic
+	PassengerLbsMQTopic = "lbs.dispatcher.passenger"
 )

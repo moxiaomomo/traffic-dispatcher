@@ -10,7 +10,7 @@ func Publish(topic string, msg string) {
 	// 创建一个消息
 	mqMsg := &broker.Message{
 		Header: map[string]string{
-			"from": "driver",
+			"from": "passenger",
 		},
 		Body: []byte(msg),
 	}

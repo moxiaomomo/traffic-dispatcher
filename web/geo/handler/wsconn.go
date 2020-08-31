@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/util/log"
+	"github.com/micro/go-micro/v2/logger"
 
+	"traffic-dispatcher/api/driver/mq"
+	"traffic-dispatcher/config"
 	"traffic-dispatcher/model"
 	wsconn "traffic-dispatcher/net"
 	lbsProto "traffic-dispatcher/proto/lbs"
@@ -21,9 +23,9 @@ func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 		Name: "ReportGeoInfo",
 		Data: data,
 	}); err == nil {
-		log.Info(rsp.GetMsg())
+		logger.Info(rsp.GetMsg())
 	} else {
-		log.Error(err.Error())
+		logger.Error(err.Error())
 	}
 }
 
@@ -35,7 +37,7 @@ func queryGeoInfo(cliRole model.ClientRole, data []byte) {
 	}); err == nil {
 		conn.WriteMessage(rsp.GetData())
 	} else {
-		log.Error(err.Error())
+		logger.Error(err.Error())
 	}
 }
 
@@ -45,6 +47,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	var wsMsg model.WSMessage
 	var wsMsgByte []byte
 	var err error
+	var roleStr string
 
 	// upgrade websocket
 	if wsConn, err = wsconn.WsUpgrader.Upgrade(c.Writer, c.Request, nil); err != nil {
@@ -52,7 +55,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	}
 	// initiate connection
 	if conn, err = wsconn.InitConnection(wsConn); err != nil {
-		log.Info(err.Error())
+		logger.Info(err.Error())
 		goto ERR
 	}
 
@@ -78,9 +81,18 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		}
 	}()
 
+	// 根据用户角色订阅不同topic信息
+	roleStr = c.Param("role")
+	logger.Info(roleStr)
+	if model.IsDriver(roleStr) {
+		go mq.Subscribe(config.DriverLbsMQTopic)
+	} else if model.IsPassenger(roleStr) {
+		go mq.Subscribe(config.PassengerLbsMQTopic)
+	}
+
 	for {
 		if wsMsgByte, err = conn.ReadMessage(); err != nil {
-			log.Info(err.Error())
+			logger.Info(err.Error())
 			goto ERR
 		} else {
 			if err := json.Unmarshal(wsMsgByte, &wsMsg); err == nil {
@@ -95,7 +107,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 
 ERR:
 	conn.Close()
-
+	logger.Info("===========connection closed===========")
 	wsMsg = model.WSMessage{}
 	wsMsgByte = nil
 

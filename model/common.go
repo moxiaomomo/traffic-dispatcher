@@ -12,20 +12,6 @@ const (
 	CmdReportGeo
 )
 
-// ClientRole 客户角色
-type ClientRole int
-
-const (
-	// ClientUnknown 未知role
-	ClientUnknown ClientRole = iota
-	// ClientDriver 司机角色
-	ClientDriver
-	// ClientPassenger 乘客角色
-	ClientPassenger
-	// ClientAdmin 乘管理员角色
-	ClientAdmin
-)
-
 // OrderState 订单状态
 type OrderState int
 
