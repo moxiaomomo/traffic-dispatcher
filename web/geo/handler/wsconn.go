@@ -56,7 +56,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	// initiate connection
 	if conn, err = wsconn.InitConnection(wsConn); err != nil {
 		logger.Info(err.Error())
-		goto ERR
+		return
 	}
 
 	wsConnCount++
@@ -82,8 +82,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	}()
 
 	// 根据用户角色订阅不同topic信息
-	roleStr = c.Param("role")
-	logger.Info(roleStr)
+	roleStr = c.Query("role")
 	if model.IsDriver(roleStr) {
 		go mq.Subscribe(config.DriverLbsMQTopic)
 	} else if model.IsPassenger(roleStr) {
