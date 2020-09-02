@@ -5,6 +5,7 @@
 ## 配置 redis 及映射目录
 
 ```bash
+$ sudo apt install redis-tools
 $ sudo mkdir -p /usr/local/redis/conf /usr/local/redis/data /usr/local/redis/logs
 $ sudo cp redis.conf /usr/local/redis/conf/
 $ sudo docker pull redis:6.0
