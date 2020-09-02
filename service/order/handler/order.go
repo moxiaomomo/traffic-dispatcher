@@ -35,3 +35,15 @@ func (o *Order) AcceptOrder(ctx context.Context, req *order.ReqAcceptOrder, rsp 
 	}
 	return nil
 }
+
+func (o *Order) StartOrder(ctx context.Context, req *order.ReqStartOrder, rsp *order.RespStartOrder) error {
+	logger.Infof("Received StartOrder request: %s\n", req.GetOrder().DriverId)
+
+	if dbOrder, err := dbmysql.StartOrder(util.ProtoOrder2OrmOrder(req.GetOrder())); err == nil {
+		rsp.Code = int32(config.StatusOK)
+		rsp.Order = util.OrmOrder2ProtoOrder(dbOrder)
+	} else {
+		rsp.Code = int32(config.StatusServerError)
+	}
+	return nil
+}
