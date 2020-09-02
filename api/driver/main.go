@@ -1,11 +1,15 @@
 package main
 
 import (
+	"log"
 	"traffic-dispatcher/api/driver/handler"
+	"traffic-dispatcher/api/driver/mq"
+	"traffic-dispatcher/config"
 	"traffic-dispatcher/proto/order"
 	user "traffic-dispatcher/proto/user"
 
 	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/logger"
 )
 
@@ -31,6 +35,15 @@ func main() {
 			&handler.Order{Client: order.NewOrderService("go.micro.srv.order", service.Client())},
 		),
 	)
+
+	// init broker
+	if err := broker.Init(); err != nil {
+		log.Fatalf("broker.Init() error :%v\n", err)
+	}
+	if err := broker.Connect(); err != nil {
+		log.Fatalf("broker.Connect() error:%v\n", err)
+	}
+	go mq.Subscribe(config.DriverLbsMQTopic)
 
 	if err := service.Run(); err != nil {
 		logger.Fatal(err)

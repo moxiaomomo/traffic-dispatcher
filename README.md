@@ -80,8 +80,14 @@ go run api/driver/main.go --registry=etcd --registry_address=172.30.0.10:2379
 # 启动 passenger api service
 go run api/passenger/main.go --registry=etcd --registry_address=172.30.0.10:2379
 
+# 启动 geo web
+go run web/geo/main.go --registry=etcd --registry_address=172.30.0.10:2379
+
 # 启动micro api gateway
 micro --registry=etcd --registry_address=172.30.0.10:2379 api --handler=api
+
+# 启动micro web gateway
+micro --registry=etcd --registry_address=172.30.0.10:2379 web
 
 # 测试
 
