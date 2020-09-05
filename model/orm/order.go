@@ -16,8 +16,10 @@ type Order struct {
 	DestGeo string
 	// CreateAt 创建时间
 	CreateAt *time.Time
-	// Accept 接单时间
+	// AcceptAt 接单时间
 	AcceptAt *time.Time
+	// StartAt 行程开始时间
+	StartAt *time.Time
 	// Cancel 取消时间
 	CancelAt *time.Time
 	// FinishAt 完成时间
