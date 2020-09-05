@@ -103,11 +103,15 @@ curl -X POST "http://localhost:8080/passenger/user/signin" -H "content-type:appl
 curl -X POST "http://localhost:8080/driver/user/signin" -H "content-type:application/json" -d '{"role":0,"userName":"xiaohua","userPwd":"123456"}'
 # {"code":1,"msg":"Signin succeeded.","user":{"id":7,"role":1,"userID":"8c920cfdf46bdcc7744335e44684e594","userName":"xiaohua","userPwd":"123456","token":"c009573d73644d81e126668527ef05f65f47d8d8"}}
 
-## create and accept order
+## create, accept, start, finish order
 curl -X POST "http://localhost:8080/passenger/order/createOrder" -H "content-type:application/json" -d '{"srcGeo":"[110,26]","destGeo":"[112,30]","passengerId":"97d09d9efec8df12cfd093a79599efff"}'
 # {{"code":10000,"msg":"","order":{"id":2,"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","srcGeo":"[110,26]","destGeo":"[112,30]","createAt":1598544547,"passengerId":"97d09d9efec8df12cfd093a79599efff"}}
 curl -X POST "http://localhost:8080/driver/order/acceptOrder" -H "content-type:application/json" -d '{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","driverId":"8c920cfdf46bdcc7744335e44684e594"}'
 # {"code":10000,"msg":"","order":{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","acceptAt":1598544858,"driverId":"8c920cfdf46bdcc7744335e44684e594","status":1}}
+curl -X POST "http://localhost:8080/driver/order/startOrder" -H "content-type:application/json" -d '{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","driverId":"8c920cfdf46bdcc7744335e44684e594"}'
+# {"code":10000,"msg":"","order":{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","startAt":1599291273,"driverId":"8c920cfdf46bdcc7744335e44684e594","status":2}}
+curl -X POST "http://localhost:8080/driver/order/finishOrder" -H "content-type:application/json" -d '{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","driverId":"8c920cfdf46bdcc7744335e44684e594"}'
+# {"code":10000,"msg":"","order":{"orderId":"53463c941b2b6e7b7b6ab28bd13b31ae","finishAt":1599291542,"driverId":"8c920cfdf46bdcc7744335e44684e594","status":2}}
 
 ## query geo nearby
 curl -X POST "http://localhost:8080/passenger/lbs/queryGeoNearby" -H "content-type:application/json" -d '{"geo":{"lat":26,"lng":110},"role":1}'

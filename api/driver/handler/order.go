@@ -45,3 +45,55 @@ func (s *Order) AcceptOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 
 	return nil
 }
+
+func (s *Order) StartOrder(ctx context.Context, req *api.Request, rsp *api.Response) error {
+	reqOrder, err := parseReqOrderBody(req)
+	if err != nil {
+		return errors.BadRequest("go.micro.api.driver", "request invalid")
+	}
+	reqOrder.StartAt = time.Now().Unix()
+	reqOrder.Status = int32(model.OrderProcessing)
+
+	response, err := s.Client.StartOrder(ctx, &order.ReqStartOrder{
+		Order: &reqOrder,
+	})
+	if err != nil {
+		return err
+	}
+
+	rsp.StatusCode = 200
+	b, _ := json.Marshal(map[string]interface{}{
+		"code":  response.GetCode(),
+		"order": response.GetOrder(),
+		"msg":   response.GetMessage(),
+	})
+	rsp.Body = string(b)
+
+	return nil
+}
+
+func (s *Order) FinishOrder(ctx context.Context, req *api.Request, rsp *api.Response) error {
+	reqOrder, err := parseReqOrderBody(req)
+	if err != nil {
+		return errors.BadRequest("go.micro.api.driver", "request invalid")
+	}
+	reqOrder.FinishAt = time.Now().Unix()
+	reqOrder.Status = int32(model.OrderProcessing)
+
+	response, err := s.Client.FinishOrder(ctx, &order.ReqFinishOrder{
+		Order: &reqOrder,
+	})
+	if err != nil {
+		return err
+	}
+
+	rsp.StatusCode = 200
+	b, _ := json.Marshal(map[string]interface{}{
+		"code":  response.GetCode(),
+		"order": response.GetOrder(),
+		"msg":   response.GetMessage(),
+	})
+	rsp.Body = string(b)
+
+	return nil
+}

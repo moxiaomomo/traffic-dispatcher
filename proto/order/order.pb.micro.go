@@ -48,6 +48,8 @@ type OrderService interface {
 	AcceptOrder(ctx context.Context, in *ReqAcceptOrder, opts ...client.CallOption) (*RespAcceptOrder, error)
 	// 订单行程开始
 	StartOrder(ctx context.Context, in *ReqStartOrder, opts ...client.CallOption) (*RespStartOrder, error)
+	// 订单行程完成
+	FinishOrder(ctx context.Context, in *ReqFinishOrder, opts ...client.CallOption) (*RespFinishOrder, error)
 }
 
 type orderService struct {
@@ -92,6 +94,16 @@ func (c *orderService) StartOrder(ctx context.Context, in *ReqStartOrder, opts .
 	return out, nil
 }
 
+func (c *orderService) FinishOrder(ctx context.Context, in *ReqFinishOrder, opts ...client.CallOption) (*RespFinishOrder, error) {
+	req := c.c.NewRequest(c.name, "Order.FinishOrder", in)
+	out := new(RespFinishOrder)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Order service
 
 type OrderHandler interface {
@@ -101,6 +113,8 @@ type OrderHandler interface {
 	AcceptOrder(context.Context, *ReqAcceptOrder, *RespAcceptOrder) error
 	// 订单行程开始
 	StartOrder(context.Context, *ReqStartOrder, *RespStartOrder) error
+	// 订单行程完成
+	FinishOrder(context.Context, *ReqFinishOrder, *RespFinishOrder) error
 }
 
 func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.HandlerOption) error {
@@ -108,6 +122,7 @@ func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.Han
 		CreateOrder(ctx context.Context, in *ReqCreateOrder, out *RespCreateOrder) error
 		AcceptOrder(ctx context.Context, in *ReqAcceptOrder, out *RespAcceptOrder) error
 		StartOrder(ctx context.Context, in *ReqStartOrder, out *RespStartOrder) error
+		FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error
 	}
 	type Order struct {
 		order
@@ -130,4 +145,8 @@ func (h *orderHandler) AcceptOrder(ctx context.Context, in *ReqAcceptOrder, out 
 
 func (h *orderHandler) StartOrder(ctx context.Context, in *ReqStartOrder, out *RespStartOrder) error {
 	return h.OrderHandler.StartOrder(ctx, in, out)
+}
+
+func (h *orderHandler) FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error {
+	return h.OrderHandler.FinishOrder(ctx, in, out)
 }

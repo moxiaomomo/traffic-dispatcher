@@ -60,3 +60,19 @@ func StartOrder(order *orm.Order) (*orm.Order, error) {
 	).Error
 	return order, err
 }
+
+// FinishOrder 处理订单(开始行程)
+func FinishOrder(order *orm.Order) (*orm.Order, error) {
+	if order.OrderId == "" {
+		return nil, errors.New("Invalid order to finish")
+	}
+
+	// 更新指定字段
+	err := dbmysql.Conn().Model(&order).Where("order_id = ?", order.OrderId).Updates(
+		orm.Order{
+			FinishAt: order.FinishAt,
+			Status:   order.Status,
+		},
+	).Error
+	return order, err
+}

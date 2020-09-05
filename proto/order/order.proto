@@ -10,6 +10,8 @@ service Order {
   rpc AcceptOrder(ReqAcceptOrder) returns (RespAcceptOrder) {}
   // 订单行程开始
   rpc StartOrder(ReqStartOrder) returns (RespStartOrder) {}
+  // 订单行程完成
+  rpc FinishOrder(ReqFinishOrder) returns (RespFinishOrder) {}
 }
 
 message order {
@@ -57,6 +59,17 @@ message ReqStartOrder {
 }
 
 message RespStartOrder {
+  int32 code = 1;
+  order order = 2;
+  string message = 3;
+}
+
+message ReqFinishOrder {
+  order order = 1;
+  string sign = 2;
+}
+
+message RespFinishOrder {
   int32 code = 1;
   order order = 2;
   string message = 3;
