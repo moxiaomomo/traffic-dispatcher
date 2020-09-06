@@ -78,6 +78,9 @@ func OrmOrder2ProtoOrder(order *orm.Order) *orderProto.Order {
 	if order.AcceptAt != nil {
 		tmp.AcceptAt = order.AcceptAt.Unix()
 	}
+	if order.GetOnAt != nil {
+		tmp.GetOnAt = order.GetOnAt.Unix()
+	}
 	if order.StartAt != nil {
 		tmp.StartAt = order.StartAt.Unix()
 	}
@@ -110,6 +113,10 @@ func ProtoOrder2OrmOrder(order *orderProto.Order) *orm.Order {
 	if order.AcceptAt > 0 {
 		acceptAt := time.Unix(order.AcceptAt, 0)
 		tmp.AcceptAt = &acceptAt
+	}
+	if order.GetOnAt > 0 {
+		getOnAt := time.Unix(order.GetOnAt, 0)
+		tmp.GetOnAt = &getOnAt
 	}
 	if order.StartAt > 0 {
 		startAt := time.Unix(order.StartAt, 0)
