@@ -22,8 +22,8 @@ message user {
   string phone = 7;
   bool phoneValidated = 8;
   bool emailValidated = 9;
-  uint64 signupAt = 10;
-  uint64 lastActive = 11;
+  int64 signupAt = 10;
+  int64 lastActive = 11;
   string profile = 12;
   int32 status = 13;
   string token = 14;

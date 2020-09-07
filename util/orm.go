@@ -1,6 +1,8 @@
 package util
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 	"traffic-dispatcher/model/orm"
 	orderProto "traffic-dispatcher/proto/order"
@@ -23,12 +25,9 @@ func OrmUser2ProtoUser(user *orm.User) *userProto.User {
 		Status:         int32(user.Status),
 		// Token:          user.Token,
 	}
-	if user.SignupAt != nil {
-		tmp.SignupAt = uint64(user.SignupAt.Unix())
-	}
-	if user.LastActive != nil {
-		tmp.LastActive = uint64(user.LastActive.Unix())
-	}
+
+	convertTimeField(&tmp, user)
+
 	return &tmp
 }
 
@@ -48,14 +47,9 @@ func ProtoUser2OrmUser(user *userProto.User) *orm.User {
 		Status:         int(user.Status),
 		// Token:          user.Token,
 	}
-	if user.SignupAt > 0 {
-		signupAt := time.Unix(int64(user.SignupAt), 0)
-		tmp.SignupAt = &signupAt
-	}
-	if user.LastActive > 0 {
-		lastActive := time.Unix(int64(user.LastActive), 0)
-		tmp.LastActive = &lastActive
-	}
+
+	convertTimeField(&tmp, user)
+
 	return &tmp
 }
 
@@ -72,24 +66,9 @@ func OrmOrder2ProtoOrder(order *orm.Order) *orderProto.Order {
 		DriverId:    order.DriverId,
 		Status:      order.Status,
 	}
-	if order.CreateAt != nil {
-		tmp.CreateAt = order.CreateAt.Unix()
-	}
-	if order.AcceptAt != nil {
-		tmp.AcceptAt = order.AcceptAt.Unix()
-	}
-	if order.GetOnAt != nil {
-		tmp.GetOnAt = order.GetOnAt.Unix()
-	}
-	if order.StartAt != nil {
-		tmp.StartAt = order.StartAt.Unix()
-	}
-	if order.CancelAt != nil {
-		tmp.CancelAt = order.CancelAt.Unix()
-	}
-	if order.FinishAt != nil {
-		tmp.FinishAt = order.FinishAt.Unix()
-	}
+
+	convertTimeField(&tmp, order)
+
 	return &tmp
 }
 
@@ -106,29 +85,49 @@ func ProtoOrder2OrmOrder(order *orderProto.Order) *orm.Order {
 		DriverId:    order.DriverId,
 		Status:      order.Status,
 	}
-	if order.CreateAt > 0 {
-		createAt := time.Unix(order.CreateAt, 0)
-		tmp.CreateAt = &createAt
-	}
-	if order.AcceptAt > 0 {
-		acceptAt := time.Unix(order.AcceptAt, 0)
-		tmp.AcceptAt = &acceptAt
-	}
-	if order.GetOnAt > 0 {
-		getOnAt := time.Unix(order.GetOnAt, 0)
-		tmp.GetOnAt = &getOnAt
-	}
-	if order.StartAt > 0 {
-		startAt := time.Unix(order.StartAt, 0)
-		tmp.StartAt = &startAt
-	}
-	if order.CancelAt > 0 {
-		cancelAt := time.Unix(order.CancelAt, 0)
-		tmp.CancelAt = &cancelAt
-	}
-	if order.FinishAt > 0 {
-		finishAt := time.Unix(order.FinishAt, 0)
-		tmp.FinishAt = &finishAt
-	}
+
+	convertTimeField(&tmp, order)
+
 	return &tmp
+}
+
+func struct2map(ptr interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+	names := []string{"SignupAt", "LastActive", "CreateAt", "AcceptAt",
+		"GetOnAt", "StartAt", "CancelAt", "FinishAt"}
+
+	tv := reflect.ValueOf(ptr).Elem()
+
+	for i := 0; i < tv.NumField(); i++ {
+		fieldInfo := tv.Type().Field(i)
+		tt := fmt.Sprintf("%v", fieldInfo.Type)
+		if yes, _ := Contain(names, fieldInfo.Name); yes {
+			val := tv.FieldByName(fieldInfo.Name).Interface()
+			if tt == "*time.Time" {
+				if ok := val.(*time.Time); ok != nil {
+					res[fieldInfo.Name] = ok.Unix()
+				}
+			} else {
+				if ok := val.(int64); ok > 0 {
+					nTime := time.Unix(ok, 0)
+					res[fieldInfo.Name] = &nTime
+				}
+			}
+		}
+	}
+	return res
+}
+
+func convertTimeField(ptrDest interface{}, ptrSrc interface{}) {
+	fields := struct2map(ptrSrc)
+	v := reflect.ValueOf(ptrDest).Elem() // the struct variable
+	for i := 0; i < v.NumField(); i++ {
+		fieldInfo := v.Type().Field(i)
+		if value, ok := fields[fieldInfo.Name]; ok {
+			//给结构体赋值 保证赋值时数据类型一致
+			if reflect.ValueOf(value).Type() == v.FieldByName(fieldInfo.Name).Type() {
+				v.FieldByName(fieldInfo.Name).Set(reflect.ValueOf(value))
+			}
+		}
+	}
 }

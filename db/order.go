@@ -45,6 +45,22 @@ func AcceptOrder(order *orm.Order) (*orm.Order, error) {
 	return order, err
 }
 
+// ConfirmGetOn 处理订单(确认上车)
+func ConfirmGetOn(order *orm.Order) (*orm.Order, error) {
+	if order.OrderId == "" {
+		return nil, errors.New("Invalid order to confirm geton")
+	}
+
+	// 更新指定字段
+	err := dbmysql.Conn().Model(&order).Where("order_id = ?", order.OrderId).Updates(
+		orm.Order{
+			GetOnAt: order.GetOnAt,
+			Status:  order.Status,
+		},
+	).Error
+	return order, err
+}
+
 // StartOrder 处理订单(开始行程)
 func StartOrder(order *orm.Order) (*orm.Order, error) {
 	if order.OrderId == "" {

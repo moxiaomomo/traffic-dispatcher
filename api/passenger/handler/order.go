@@ -45,3 +45,29 @@ func (s *Order) CreateOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 
 	return nil
 }
+
+func (s *Order) ConfirmGetOn(ctx context.Context, req *api.Request, rsp *api.Response) error {
+	reqOrder, err := parseReqOrderBody(req)
+	if err != nil {
+		return errors.BadRequest("go.micro.api.passenger", "request invalid")
+	}
+	reqOrder.CreateAt = time.Now().Unix()
+	reqOrder.Status = int32(model.OrderCreated)
+
+	response, err := s.Client.ConfirmGetOn(ctx, &order.ReqConfirmGetOn{
+		Order: &reqOrder,
+	})
+	if err != nil {
+		return err
+	}
+
+	rsp.StatusCode = 200
+	b, _ := json.Marshal(map[string]interface{}{
+		"code":  response.GetCode(),
+		"order": response.GetOrder(),
+		"msg":   response.GetMessage(),
+	})
+	rsp.Body = string(b)
+
+	return nil
+}
