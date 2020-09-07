@@ -4,6 +4,7 @@ import (
 	"context"
 	"traffic-dispatcher/config"
 	dbmysql "traffic-dispatcher/db"
+	"traffic-dispatcher/model"
 	order "traffic-dispatcher/proto/order"
 	"traffic-dispatcher/util"
 
@@ -52,6 +53,27 @@ func (o *Order) StartOrder(ctx context.Context, req *order.ReqStartOrder, rsp *o
 	logger.Infof("Received StartOrder request: %s\n", req.GetOrder().DriverId)
 
 	if dbOrder, err := dbmysql.StartOrder(util.ProtoOrder2OrmOrder(req.GetOrder())); err == nil {
+		rsp.Code = int32(config.StatusOK)
+		rsp.Order = util.OrmOrder2ProtoOrder(dbOrder)
+	} else {
+		rsp.Code = int32(config.StatusServerError)
+	}
+	return nil
+}
+
+func (o *Order) CancelOrder(ctx context.Context, req *order.ReqCancelOrder, rsp *order.RespCancelOrder) error {
+	logger.Infof("Received CancelOrder request: %s\n", req.GetOrder().DriverId)
+
+	if nowOrder, err := dbmysql.QueryOrder(req.GetOrder().GetOrderId()); err != nil {
+		rsp.Code = int32(config.StatusParamInvalid)
+		return nil
+	} else if nowOrder.Status != int32(model.OrderCreated) && nowOrder.Status != int32(model.OrderAccepted) {
+		rsp.Code = int32(config.StatusNotPermitted)
+		rsp.Message = "当前订单不满足取消条件"
+		return nil
+	}
+
+	if dbOrder, err := dbmysql.CancelOrder(util.ProtoOrder2OrmOrder(req.GetOrder())); err == nil {
 		rsp.Code = int32(config.StatusOK)
 		rsp.Order = util.OrmOrder2ProtoOrder(dbOrder)
 	} else {

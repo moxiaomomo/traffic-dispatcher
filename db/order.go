@@ -20,6 +20,15 @@ func genOrderID(order *orm.Order) string {
 	return util.MD5([]byte(tmp))
 }
 
+func QueryOrder(orderId string) (order orm.Order, err error) {
+	dbmysql.Conn().Model(&order).Where("order_id = ?", orderId).First(&order)
+	if order.OrderId != orderId {
+		err = errors.New("No order matched")
+		return
+	}
+	return
+}
+
 // CreateOrder 创建订单
 func CreateOrder(order *orm.Order) (*orm.Order, error) {
 	order.OrderId = genOrderID(order)
@@ -72,6 +81,22 @@ func StartOrder(order *orm.Order) (*orm.Order, error) {
 		orm.Order{
 			StartAt: order.StartAt,
 			Status:  order.Status,
+		},
+	).Error
+	return order, err
+}
+
+// CancelOrder 取消订单
+func CancelOrder(order *orm.Order) (*orm.Order, error) {
+	if order.OrderId == "" {
+		return nil, errors.New("Invalid order to cancel")
+	}
+
+	// 更新指定字段
+	err := dbmysql.Conn().Model(&order).Where("order_id = ?", order.OrderId).Updates(
+		orm.Order{
+			CancelAt: order.CancelAt,
+			Status:   order.Status,
 		},
 	).Error
 	return order, err

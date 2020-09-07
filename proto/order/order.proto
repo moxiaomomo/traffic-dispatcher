@@ -13,6 +13,8 @@ service Order {
   // 订单行程开始
   rpc StartOrder(ReqStartOrder) returns (RespStartOrder) {}
   // 订单行程完成
+  rpc CancelOrder(ReqCancelOrder) returns (RespCancelOrder) {}
+  // 订单行程完成
   rpc FinishOrder(ReqFinishOrder) returns (RespFinishOrder) {}
 }
 
@@ -73,6 +75,17 @@ message ReqStartOrder {
 }
 
 message RespStartOrder {
+  int32 code = 1;
+  order order = 2;
+  string message = 3;
+}
+
+message ReqCancelOrder {
+  order order = 1;
+  string sign = 2;
+}
+
+message RespCancelOrder {
   int32 code = 1;
   order order = 2;
   string message = 3;

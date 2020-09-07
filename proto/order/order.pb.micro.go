@@ -51,6 +51,8 @@ type OrderService interface {
 	// 订单行程开始
 	StartOrder(ctx context.Context, in *ReqStartOrder, opts ...client.CallOption) (*RespStartOrder, error)
 	// 订单行程完成
+	CancelOrder(ctx context.Context, in *ReqCancelOrder, opts ...client.CallOption) (*RespCancelOrder, error)
+	// 订单行程完成
 	FinishOrder(ctx context.Context, in *ReqFinishOrder, opts ...client.CallOption) (*RespFinishOrder, error)
 }
 
@@ -106,6 +108,16 @@ func (c *orderService) StartOrder(ctx context.Context, in *ReqStartOrder, opts .
 	return out, nil
 }
 
+func (c *orderService) CancelOrder(ctx context.Context, in *ReqCancelOrder, opts ...client.CallOption) (*RespCancelOrder, error) {
+	req := c.c.NewRequest(c.name, "Order.CancelOrder", in)
+	out := new(RespCancelOrder)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *orderService) FinishOrder(ctx context.Context, in *ReqFinishOrder, opts ...client.CallOption) (*RespFinishOrder, error) {
 	req := c.c.NewRequest(c.name, "Order.FinishOrder", in)
 	out := new(RespFinishOrder)
@@ -128,6 +140,8 @@ type OrderHandler interface {
 	// 订单行程开始
 	StartOrder(context.Context, *ReqStartOrder, *RespStartOrder) error
 	// 订单行程完成
+	CancelOrder(context.Context, *ReqCancelOrder, *RespCancelOrder) error
+	// 订单行程完成
 	FinishOrder(context.Context, *ReqFinishOrder, *RespFinishOrder) error
 }
 
@@ -137,6 +151,7 @@ func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.Han
 		AcceptOrder(ctx context.Context, in *ReqAcceptOrder, out *RespAcceptOrder) error
 		ConfirmGetOn(ctx context.Context, in *ReqConfirmGetOn, out *RespConfirmGetOn) error
 		StartOrder(ctx context.Context, in *ReqStartOrder, out *RespStartOrder) error
+		CancelOrder(ctx context.Context, in *ReqCancelOrder, out *RespCancelOrder) error
 		FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error
 	}
 	type Order struct {
@@ -164,6 +179,10 @@ func (h *orderHandler) ConfirmGetOn(ctx context.Context, in *ReqConfirmGetOn, ou
 
 func (h *orderHandler) StartOrder(ctx context.Context, in *ReqStartOrder, out *RespStartOrder) error {
 	return h.OrderHandler.StartOrder(ctx, in, out)
+}
+
+func (h *orderHandler) CancelOrder(ctx context.Context, in *ReqCancelOrder, out *RespCancelOrder) error {
+	return h.OrderHandler.CancelOrder(ctx, in, out)
 }
 
 func (h *orderHandler) FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error {
