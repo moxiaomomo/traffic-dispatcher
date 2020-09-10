@@ -10,6 +10,8 @@ service User {
   rpc Signin(ReqSignin) returns (RespSignin) {}
   // 获取用户信息
   rpc UserInfo(ReqUserInfo) returns (RespUserInfo) {}
+  // 用户注销登录
+  rpc Signout(ReqSignout) returns (RespSignout) {}
 }
 
 message user {
@@ -61,4 +63,14 @@ message RespUserInfo {
   int32 code = 1;
   user user = 2;
   string message = 3;
+}
+
+message ReqSignout {
+  user user = 1;
+  string token = 2;
+}
+
+message RespSignout {
+  int32 code = 1;
+  string message = 2;
 }

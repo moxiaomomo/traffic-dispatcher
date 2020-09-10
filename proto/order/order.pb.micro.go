@@ -50,10 +50,12 @@ type OrderService interface {
 	ConfirmGetOn(ctx context.Context, in *ReqConfirmGetOn, opts ...client.CallOption) (*RespConfirmGetOn, error)
 	// 订单行程开始
 	StartOrder(ctx context.Context, in *ReqStartOrder, opts ...client.CallOption) (*RespStartOrder, error)
-	// 订单行程完成
+	// 订单行程取消
 	CancelOrder(ctx context.Context, in *ReqCancelOrder, opts ...client.CallOption) (*RespCancelOrder, error)
 	// 订单行程完成
 	FinishOrder(ctx context.Context, in *ReqFinishOrder, opts ...client.CallOption) (*RespFinishOrder, error)
+	// 查看订单行程历史
+	QueryOrderHis(ctx context.Context, in *ReqOrderHis, opts ...client.CallOption) (*RespOrderHis, error)
 }
 
 type orderService struct {
@@ -128,6 +130,16 @@ func (c *orderService) FinishOrder(ctx context.Context, in *ReqFinishOrder, opts
 	return out, nil
 }
 
+func (c *orderService) QueryOrderHis(ctx context.Context, in *ReqOrderHis, opts ...client.CallOption) (*RespOrderHis, error) {
+	req := c.c.NewRequest(c.name, "Order.QueryOrderHis", in)
+	out := new(RespOrderHis)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Order service
 
 type OrderHandler interface {
@@ -139,10 +151,12 @@ type OrderHandler interface {
 	ConfirmGetOn(context.Context, *ReqConfirmGetOn, *RespConfirmGetOn) error
 	// 订单行程开始
 	StartOrder(context.Context, *ReqStartOrder, *RespStartOrder) error
-	// 订单行程完成
+	// 订单行程取消
 	CancelOrder(context.Context, *ReqCancelOrder, *RespCancelOrder) error
 	// 订单行程完成
 	FinishOrder(context.Context, *ReqFinishOrder, *RespFinishOrder) error
+	// 查看订单行程历史
+	QueryOrderHis(context.Context, *ReqOrderHis, *RespOrderHis) error
 }
 
 func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.HandlerOption) error {
@@ -153,6 +167,7 @@ func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.Han
 		StartOrder(ctx context.Context, in *ReqStartOrder, out *RespStartOrder) error
 		CancelOrder(ctx context.Context, in *ReqCancelOrder, out *RespCancelOrder) error
 		FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error
+		QueryOrderHis(ctx context.Context, in *ReqOrderHis, out *RespOrderHis) error
 	}
 	type Order struct {
 		order
@@ -187,4 +202,8 @@ func (h *orderHandler) CancelOrder(ctx context.Context, in *ReqCancelOrder, out 
 
 func (h *orderHandler) FinishOrder(ctx context.Context, in *ReqFinishOrder, out *RespFinishOrder) error {
 	return h.OrderHandler.FinishOrder(ctx, in, out)
+}
+
+func (h *orderHandler) QueryOrderHis(ctx context.Context, in *ReqOrderHis, out *RespOrderHis) error {
+	return h.OrderHandler.QueryOrderHis(ctx, in, out)
 }

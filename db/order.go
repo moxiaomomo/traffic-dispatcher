@@ -20,12 +20,29 @@ func genOrderID(order *orm.Order) string {
 	return util.MD5([]byte(tmp))
 }
 
-func QueryOrder(orderId string) (order orm.Order, err error) {
-	dbmysql.Conn().Model(&order).Where("order_id = ?", orderId).First(&order)
-	if order.OrderId != orderId {
+// QueryOrder 根据订单id查询订单
+func QueryOrder(orderID string) (order orm.Order, err error) {
+	dbmysql.Conn().Model(&order).Where("order_id = ?", orderID).First(&order)
+	if order.OrderId != orderID {
 		err = errors.New("No order matched")
 		return
 	}
+	return
+}
+
+// QueryOrderByDriver 根据司机id及日期范围来查询订单
+func QueryOrderByDriver(userID string, fromTS int64, toTS int64) (orders []orm.Order, err error) {
+	from := time.Unix(fromTS, 0)
+	to := time.Unix(toTS, 0)
+	dbmysql.Conn().Where("driver_id = ? and create_at>=? and create_at<=?", userID, from, to).Find(&orders)
+	return
+}
+
+// QueryOrderByPassenger 根据乘客id及日期范围来查询订单
+func QueryOrderByPassenger(userID string, fromTS int64, toTS int64) (orders []orm.Order, err error) {
+	from := time.Unix(fromTS, 0)
+	to := time.Unix(toTS, 0)
+	dbmysql.Conn().Where("passenger_id = ? and create_at>=? and create_at<=?", userID, from, to).Find(&orders)
 	return
 }
 

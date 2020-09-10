@@ -5,6 +5,7 @@ import (
 	"traffic-dispatcher/config"
 	dbmysql "traffic-dispatcher/db"
 	"traffic-dispatcher/model"
+	"traffic-dispatcher/model/orm"
 	order "traffic-dispatcher/proto/order"
 	"traffic-dispatcher/util"
 
@@ -91,5 +92,31 @@ func (o *Order) FinishOrder(ctx context.Context, req *order.ReqFinishOrder, rsp 
 	} else {
 		rsp.Code = int32(config.StatusServerError)
 	}
+	return nil
+}
+
+// QueryOrderHis 查询行程订单历史
+func (o *Order) QueryOrderHis(ctx context.Context, req *order.ReqOrderHis, rsp *order.RespOrderHis) error {
+	logger.Infof("Received QueryOrderHis request: %s\n", req.GetUserId())
+
+	var dbOrders []orm.Order
+	var err error
+	if req.GetRole() == int32(model.ClientDriver) {
+		dbOrders, err = dbmysql.QueryOrderByDriver(req.UserId, req.FromTS, req.ToTS)
+	} else if req.GetRole() == int32(model.ClientPassenger) {
+		dbOrders, err = dbmysql.QueryOrderByPassenger(req.UserId, req.FromTS, req.ToTS)
+	}
+
+	if err != nil {
+		rsp.Code = int32(config.StatusServerError)
+		return nil
+	}
+
+	var ptOrders []*order.Order
+	for _, dbOrder := range dbOrders {
+		ptOrders = append(ptOrders, util.OrmOrder2ProtoOrder(&dbOrder))
+	}
+
+	rsp.Orders = ptOrders
 	return nil
 }

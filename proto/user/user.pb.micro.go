@@ -48,6 +48,8 @@ type UserService interface {
 	Signin(ctx context.Context, in *ReqSignin, opts ...client.CallOption) (*RespSignin, error)
 	// 获取用户信息
 	UserInfo(ctx context.Context, in *ReqUserInfo, opts ...client.CallOption) (*RespUserInfo, error)
+	// 用户注销登录
+	Signout(ctx context.Context, in *ReqSignout, opts ...client.CallOption) (*RespSignout, error)
 }
 
 type userService struct {
@@ -92,6 +94,16 @@ func (c *userService) UserInfo(ctx context.Context, in *ReqUserInfo, opts ...cli
 	return out, nil
 }
 
+func (c *userService) Signout(ctx context.Context, in *ReqSignout, opts ...client.CallOption) (*RespSignout, error) {
+	req := c.c.NewRequest(c.name, "User.Signout", in)
+	out := new(RespSignout)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -101,6 +113,8 @@ type UserHandler interface {
 	Signin(context.Context, *ReqSignin, *RespSignin) error
 	// 获取用户信息
 	UserInfo(context.Context, *ReqUserInfo, *RespUserInfo) error
+	// 用户注销登录
+	Signout(context.Context, *ReqSignout, *RespSignout) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -108,6 +122,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		Signup(ctx context.Context, in *ReqSignup, out *RespSignup) error
 		Signin(ctx context.Context, in *ReqSignin, out *RespSignin) error
 		UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error
+		Signout(ctx context.Context, in *ReqSignout, out *RespSignout) error
 	}
 	type User struct {
 		user
@@ -130,4 +145,8 @@ func (h *userHandler) Signin(ctx context.Context, in *ReqSignin, out *RespSignin
 
 func (h *userHandler) UserInfo(ctx context.Context, in *ReqUserInfo, out *RespUserInfo) error {
 	return h.UserHandler.UserInfo(ctx, in, out)
+}
+
+func (h *userHandler) Signout(ctx context.Context, in *ReqSignout, out *RespSignout) error {
+	return h.UserHandler.Signout(ctx, in, out)
 }
