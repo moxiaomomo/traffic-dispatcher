@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	dbmysql "traffic-dispatcher/db/mysql"
@@ -32,17 +33,27 @@ func QueryOrder(orderID string) (order orm.Order, err error) {
 
 // QueryOrderByDriver 根据司机id及日期范围来查询订单
 func QueryOrderByDriver(userID string, fromTS int64, toTS int64) (orders []orm.Order, err error) {
-	from := time.Unix(fromTS, 0)
-	to := time.Unix(toTS, 0)
-	dbmysql.Conn().Where("driver_id = ? and create_at>=? and create_at<=?", userID, from, to).Find(&orders)
+	if toTS > fromTS {
+		from := time.Unix(fromTS, 0)
+		to := time.Unix(toTS, 0)
+		dbmysql.Conn().Where("driver_id = ? and create_at>=? and create_at<=?", userID, from, to).Limit(30).Find(&orders)
+	} else {
+		dbmysql.Conn().Where("driver_id = ?", userID).Limit(30).Find(&orders)
+	}
+
 	return
 }
 
 // QueryOrderByPassenger 根据乘客id及日期范围来查询订单
 func QueryOrderByPassenger(userID string, fromTS int64, toTS int64) (orders []orm.Order, err error) {
-	from := time.Unix(fromTS, 0)
-	to := time.Unix(toTS, 0)
-	dbmysql.Conn().Where("passenger_id = ? and create_at>=? and create_at<=?", userID, from, to).Find(&orders)
+	if toTS > fromTS {
+		from := time.Unix(fromTS, 0)
+		to := time.Unix(toTS, 0)
+		dbmysql.Conn().Where("passenger_id = ? and create_at>=? and create_at<=?", userID, from, to).Limit(30).Find(&orders)
+	} else {
+		dbmysql.Conn().Where("passenger_id = ?", userID).Limit(30).Find(&orders)
+	}
+	log.Print(userID)
 	return
 }
 

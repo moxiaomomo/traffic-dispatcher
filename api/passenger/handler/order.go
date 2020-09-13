@@ -98,3 +98,27 @@ func (s *Order) CancelOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 
 	return nil
 }
+
+// QueryOrderHis todo in development
+func (s *Order) QueryOrderHis(ctx context.Context, req *api.Request, rsp *api.Response) error {
+	var hisReq order.ReqOrderHis
+	err := json.Unmarshal([]byte(req.Body), &hisReq)
+	if err != nil || len(hisReq.UserId) == 0 {
+		return errors.BadRequest("go.micro.api.passenger", "request invalid")
+	}
+
+	response, err := s.Client.QueryOrderHis(ctx, &hisReq)
+	if err != nil {
+		return err
+	}
+
+	rsp.StatusCode = 200
+	b, _ := json.Marshal(map[string]interface{}{
+		"code":   response.GetCode(),
+		"orders": response.GetOrders(),
+		"msg":    response.GetMessage(),
+	})
+	rsp.Body = string(b)
+
+	return nil
+}
