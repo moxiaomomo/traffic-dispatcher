@@ -31,6 +31,17 @@ func QueryOrder(orderID string) (order orm.Order, err error) {
 	return
 }
 
+// QueryActiveOrder 根据乘客id查询未完成订单
+func QueryActiveOrder(pID string) (order orm.Order, exist bool) {
+	dbmysql.Conn().Model(&order).Where("passenger_id = ? and status not in (3,4)", pID).First(&order)
+	if order.PassengerId != pID {
+		exist = false
+		return
+	}
+	exist = true
+	return
+}
+
 // QueryOrderByDriver 根据司机id及日期范围来查询订单
 func QueryOrderByDriver(userID string, fromTS int64, toTS int64) (orders []orm.Order, err error) {
 	if toTS > fromTS {
@@ -91,7 +102,7 @@ func ConfirmGetOn(order *orm.Order) (*orm.Order, error) {
 	// 更新指定字段
 	err := dbmysql.Conn().Model(&order).Where("order_id = ?", order.OrderId).Updates(
 		orm.Order{
-			GetOnAt: order.GetOnAt,
+			GetonAt: order.GetonAt,
 			Status:  order.Status,
 		},
 	).Error

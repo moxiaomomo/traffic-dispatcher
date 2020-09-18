@@ -19,7 +19,7 @@ type Order struct {
 	// AcceptAt 接单时间
 	AcceptAt *time.Time
 	// GetOnAt 确认上车时间
-	GetOnAt *time.Time
+	GetonAt *time.Time
 	// StartAt 行程开始时间
 	StartAt *time.Time
 	// Cancel 取消时间

@@ -94,7 +94,7 @@ func ProtoOrder2OrmOrder(order *orderProto.Order) *orm.Order {
 func struct2map(ptr interface{}) map[string]interface{} {
 	res := map[string]interface{}{}
 	names := []string{"SignupAt", "LastActive", "CreateAt", "AcceptAt",
-		"GetOnAt", "StartAt", "CancelAt", "FinishAt"}
+		"GetonAt", "StartAt", "CancelAt", "FinishAt"}
 
 	tv := reflect.ValueOf(ptr).Elem()
 

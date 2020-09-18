@@ -17,6 +17,11 @@ type Order struct{}
 func (o *Order) CreateOrder(ctx context.Context, req *order.ReqCreateOrder, rsp *order.RespCreateOrder) error {
 	logger.Infof("Received CreateOrder request: %s\n", req.GetOrder().PassengerId)
 
+	if _, exist := dbmysql.QueryActiveOrder(req.GetOrder().PassengerId); exist {
+		rsp.Code = int32(config.StatusDulplicated)
+		return nil
+	}
+
 	if dbOrder, err := dbmysql.CreateOrder(util.ProtoOrder2OrmOrder(req.GetOrder())); err == nil {
 		rsp.Code = int32(config.StatusOK)
 		rsp.Order = util.OrmOrder2ProtoOrder(dbOrder)
