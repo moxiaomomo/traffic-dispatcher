@@ -10,6 +10,10 @@ const (
 	CmdQueryGeo
 	// CmdReportGeo 上报geo信息
 	CmdReportGeo
+	// CmdSubscribeGeo 订阅geo推送
+	CmdSubscribeGeo
+	// CmdUnsubscribeGeo 取消订阅geo推送
+	CmdUnsubscribeGeo
 )
 
 // OrderState 订单状态
@@ -42,4 +46,8 @@ type WSMessage struct {
 	Role    ClientRole  `json:"role"`
 	Geo     GeoLocation `json:"geo"`
 	Data    []byte      `json:"data"`
+	// 查询目标role
+	QueryRole ClientRole `json:"qrole"`
+	// 查询目标geo
+	QueryGeo GeoLocation `json:"qgeo"`
 }

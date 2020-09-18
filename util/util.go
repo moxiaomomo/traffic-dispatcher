@@ -1,8 +1,10 @@
 package util
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
+	"encoding/gob"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -93,4 +95,13 @@ func Contain(target interface{}, obj interface{}) (bool, error) {
 	}
 
 	return false, errors.New("not in this array/slice/map")
+}
+
+func DeepCopyByGob(dst, src interface{}) error {
+	var buffer bytes.Buffer
+	if err := gob.NewEncoder(&buffer).Encode(src); err != nil {
+		return err
+	}
+
+	return gob.NewDecoder(&buffer).Decode(dst)
 }
