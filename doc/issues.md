@@ -127,3 +127,17 @@ driverCli = driver.NewDriverSrvService("go.micro.api.driver", client.DefaultClie
 ```
 未解
 ```
+
+- `unsupported Scan, storing driver.Value type []uint8 into type *time.Time`
+
+```
+在open连接后拼接参数：parseTime=true 即可; 如
+
+MySQLSource = "admin:test123456@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=utf8&parseTime=true"
+```
+
+- `geoNear command failed: { ok: 0.0, errmsg: "can't find ns" }]`
+
+```
+可能是mongodb中没有建立对应的collection或index
+```

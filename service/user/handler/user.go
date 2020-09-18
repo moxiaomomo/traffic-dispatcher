@@ -54,6 +54,12 @@ func (e *User) Signin(ctx context.Context, req *user.ReqSignin, rsp *user.RespSi
 	return nil
 }
 
+// Signout 用户注销登录
+func (e *User) Signout(ctx context.Context, req *user.ReqSignout, rsp *user.RespSignout) error {
+	// TODO do something
+	return nil
+}
+
 // UserInfo 用户注册
 func (e *User) UserInfo(ctx context.Context, req *user.ReqUserInfo, rsp *user.RespUserInfo) error {
 	logger.Infof("user info query: %s\n", req.User.GetUserName())

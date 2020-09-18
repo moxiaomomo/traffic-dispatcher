@@ -75,6 +75,7 @@ func QueryGeo(lat float64, lng float64, role model.ClientRole) (res []model.User
 			"maxDistance":   100000,
 			"spherical":     true,
 			"distanceField": "distance",
+			"query":         bson.M{"lat": bson.M{"$ne": ""}, "lng": bson.M{"$ne": ""}},
 		}}}
 
 	stages = append(stages, getNearbyStage)
@@ -88,7 +89,7 @@ func QueryGeo(lat float64, lng float64, role model.ClientRole) (res []model.User
 		var elem model.UserLocation
 		err = filterCursor.Decode(&elem)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
 			return
 		}
 		res = append(res, elem)
@@ -112,7 +113,7 @@ func (g *GeoLocation) QueryGeoNearby(ctx context.Context, req *lbs.QueryRequest,
 	var data model.WSMessage
 	var err error
 	if err = json.Unmarshal(req.Data, &data); err == nil {
-		if geolist, err := QueryGeo(data.Geo.Lat, data.Geo.Lng, data.Role); err == nil {
+		if geolist, err := QueryGeo(data.QueryGeo.Lat, data.QueryGeo.Lng, data.QueryRole); err == nil {
 			data, _ := json.Marshal(geolist)
 			resp.Msg = "Hi " + req.Name
 			resp.Data = data

@@ -116,6 +116,9 @@ curl -X POST "http://localhost:8080/driver/order/finishOrder" -H "content-type:a
 ## query geo nearby
 curl -X POST "http://localhost:8080/passenger/lbs/queryGeoNearby" -H "content-type:application/json" -d '{"geo":{"lat":26,"lng":110},"role":1}'
 # {"code":0,"data":"bnVsbA==","msg":"Hi "} ## TODO should be updated
+
+## query order history
+curl -X POST "http://localhost:8080/passenger/order/queryOrderHis" -H "content-type:application/json" -d '{"userId":"97d09d9efec8df12cfd093a79599efff","role":0}'
 ```
 
 - 测试 websocket 传输

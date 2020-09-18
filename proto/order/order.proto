@@ -8,10 +8,16 @@ service Order {
   rpc CreateOrder(ReqCreateOrder) returns (RespCreateOrder) {}
   // 接受订单 / 抢单
   rpc AcceptOrder(ReqAcceptOrder) returns (RespAcceptOrder) {}
+  // 订单确认上车
+  rpc ConfirmGetOn(ReqConfirmGetOn) returns (RespConfirmGetOn) {}
   // 订单行程开始
   rpc StartOrder(ReqStartOrder) returns (RespStartOrder) {}
+  // 订单行程取消
+  rpc CancelOrder(ReqCancelOrder) returns (RespCancelOrder) {}
   // 订单行程完成
   rpc FinishOrder(ReqFinishOrder) returns (RespFinishOrder) {}
+  // 查看订单行程历史
+  rpc QueryOrderHis(ReqOrderHis) returns (RespOrderHis) {}
 }
 
 message order {
@@ -21,14 +27,15 @@ message order {
   string destGeo = 4;
   int64 createAt = 5;
   int64 acceptAt = 6;
-  int64 startAt = 7;
-  int64 cancelAt = 8;
-  int64 finishAt = 9;
-  int32 cancelRole = 10;
-  double cost = 11;
-  string passengerId = 12;
-  string driverId = 13;
-  int32 status = 14;
+  int64 getOnAt = 7;
+  int64 startAt = 8;
+  int64 cancelAt = 9;
+  int64 finishAt = 10;
+  int32 cancelRole = 11;
+  double cost = 12;
+  string passengerId = 13;
+  string driverId = 14;
+  int32 status = 15;
 }
 
 message ReqCreateOrder {
@@ -53,12 +60,34 @@ message RespAcceptOrder {
   string message = 3;
 }
 
+message ReqConfirmGetOn {
+  order order = 1;
+  string sign = 2;
+}
+
+message RespConfirmGetOn {
+  int32 code = 1;
+  order order = 2;
+  string message = 3;
+}
+
 message ReqStartOrder {
   order order = 1;
   string sign = 2;
 }
 
 message RespStartOrder {
+  int32 code = 1;
+  order order = 2;
+  string message = 3;
+}
+
+message ReqCancelOrder {
+  order order = 1;
+  string sign = 2;
+}
+
+message RespCancelOrder {
   int32 code = 1;
   order order = 2;
   string message = 3;
@@ -72,5 +101,19 @@ message ReqFinishOrder {
 message RespFinishOrder {
   int32 code = 1;
   order order = 2;
+  string message = 3;
+}
+
+message ReqOrderHis {
+  string userId = 1;
+  int32 role = 2;
+  // 时间起止日期
+  int64 fromTS = 3;
+  int64 toTS = 4;
+}
+
+message RespOrderHis {
+  int32 code = 1;
+  repeated order orders = 2;
   string message = 3;
 }

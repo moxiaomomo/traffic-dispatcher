@@ -17,4 +17,8 @@ const (
 	StatusLoginFailed
 	// StatusTokenInvalid : 10005 token无效
 	StatusTokenInvalid
+	// StatusNotPermitted : 10006 操作无效
+	StatusNotPermitted
+	// StatusDulplicated : 10007 数据/操作重复
+	StatusDulplicated
 )

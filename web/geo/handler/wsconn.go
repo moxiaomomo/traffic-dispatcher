@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	defultLog "log"
 	"time"
+	"traffic-dispatcher/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/logger"
@@ -30,7 +31,9 @@ func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 }
 
 // 搜索附近坐标位置
-func queryGeoInfo(cliRole model.ClientRole, data []byte) {
+func queryGeoInfo(param model.WSMessage) {
+	data, _ := json.Marshal(param)
+	// fmt.Printf("%+v\n", string(data))
 	if rsp, err := GeoCli.QueryGeoNearby(context.TODO(), &lbsProto.QueryRequest{
 		Name: "QueryGeoInfo",
 		Data: data,
@@ -46,6 +49,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	// 搜索范围的中心位置坐标
 	var wsMsg model.WSMessage
 	var wsMsgByte []byte
+	var subMsg model.WSMessage
 	var err error
 	var roleStr string
 
@@ -74,8 +78,9 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 				// log.Info(wsMsg)
 				if wsMsg.Geo == (model.GeoLocation{}) || conn.IsClose() {
 					// ...
-				} else {
-					queryGeoInfo(wsMsg.Role, wsMsgByte)
+				} else if subMsg.Command == model.CmdSubscribeGeo {
+					// fmt.Printf("%+v\n", subMsg)
+					queryGeoInfo(subMsg)
 				}
 			}
 		}
@@ -96,9 +101,11 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		} else {
 			if err := json.Unmarshal(wsMsgByte, &wsMsg); err == nil {
 				if wsMsg.Command == model.CmdQueryGeo {
-					queryGeoInfo(wsMsg.Role, wsMsgByte)
+					queryGeoInfo(wsMsg)
 				} else if wsMsg.Command == model.CmdReportGeo {
 					reportGeoInfo(wsMsg.Role, wsMsgByte)
+				} else if wsMsg.Command == model.CmdSubscribeGeo {
+					util.DeepCopyByGob(&subMsg, wsMsg)
 				}
 			}
 		}
