@@ -141,3 +141,10 @@ MySQLSource = "admin:test123456@tcp(127.0.0.1:3306)/traffic-dispatcher?charset=u
 ```
 可能是mongodb中没有建立对应的collection或index
 ```
+
+- Command 'micro' not found, but can be installed with:
+
+```
+go get github.com/micro/micro/v2
+sudo cp "\$GOPATH/bin/micro" /usr/bin/
+```

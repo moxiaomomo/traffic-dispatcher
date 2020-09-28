@@ -4,6 +4,12 @@
 $ curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 $ sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu \
 > $(lsb_release -cs) stable"
+
+# sudo add-apt-repository \
+#   "deb [arch=amd64] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/ubuntu \
+#   $(lsb_release -cs) \
+#   stable"
+
 $ sudo apt update
 $ sudo apt install docker-ce
 $ docker info
@@ -83,5 +89,6 @@ docker-compose up -d
 - 打开etcdkeeper
 ```
 # 打开浏览器，输入: http://localhost:8899/etcdkeeper/
-# 然后输入 172.30.0.10:2379， 正常情况下可以看到Nodes根目录
+# ifconfig /ipconfig 获得本机ip后
+# 然后输入 172.30.0.10:2379  (或172.30.0.10:12379)， 正常情况下可以看到Nodes根目录
 ```
