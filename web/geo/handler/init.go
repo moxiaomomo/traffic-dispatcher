@@ -20,4 +20,7 @@ type GeoLocation struct {
 }
 
 func init() {
+	conns = make(map[string]*wsnet.WsConnection)
+	userInfos = make(map[string]*model.WSMessage)
+	subInfos = make(map[string]*model.WSMessage)
 }
