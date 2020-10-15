@@ -82,7 +82,6 @@ func queryOrderHis(userID string, role string) {
 // WSConnHandler websocket handler
 func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	// 搜索范围的中心位置坐标
-	var subMsg model.WSMessage
 	var wsMsgByte []byte
 	var err error
 	var roleStr string
@@ -125,9 +124,9 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 				}
 				if userInfos[userID].Geo == (model.GeoLocation{}) || conn.IsClose() {
 					// ...
-				} else if subMsg.Command == model.CmdSubscribeGeo {
+				} else if subInfos[userID] != nil {
 					// fmt.Printf("%+v\n", subMsg)
-					queryGeoInfo(subMsg)
+					queryGeoInfo(*subInfos[userID])
 					queryOrderHis(userID, roleStr)
 				}
 			}
@@ -156,7 +155,9 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 				} else if wsMsg.Command == model.CmdReportGeo {
 					reportGeoInfo(wsMsg.Role, wsMsgByte)
 				} else if wsMsg.Command == model.CmdSubscribeGeo {
+					var subMsg model.WSMessage
 					util.DeepCopyByGob(&subMsg, wsMsg)
+					subInfos[userID] = &subMsg
 				}
 			}
 		}
@@ -165,7 +166,6 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 ERR:
 	conn.Close()
 	logger.Info("===========connection closed===========")
-	subMsg = model.WSMessage{}
 	wsMsgByte = nil
 
 	wsConnCount--
