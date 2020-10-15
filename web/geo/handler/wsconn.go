@@ -3,8 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	defultLog "log"
+	// defultLog "log"
 	"time"
 
 	"traffic-dispatcher/config"
@@ -40,6 +39,13 @@ func reportGeoInfo(cliRole model.ClientRole, data []byte) {
 	}
 }
 
+func writeMessage(wsConn *wsnet.WsConnection, data []byte) {
+	if wsConn == nil {
+		return
+	}
+	wsConn.WriteMessage(data)
+}
+
 // 搜索附近坐标位置
 func queryGeoInfo(param model.WSMessage) {
 	data, _ := json.Marshal(param)
@@ -52,10 +58,10 @@ func queryGeoInfo(param model.WSMessage) {
 			Topic: "geolist",
 			Data:  string(rsp.GetData()),
 		}
-		fmt.Printf("resp: %+v\n", resp)
+		// fmt.Printf("resp: %+v\n", resp)
 		respB, _ := json.Marshal(resp)
-		fmt.Printf("respB: %+v\n", respB)
-		conns[param.User.UID].WriteMessage(rsp.GetData())
+		// fmt.Printf("respB: %+v\n", respB)
+		writeMessage(conns[param.User.UID], respB)
 	} else {
 		logger.Error(err.Error())
 	}
@@ -72,8 +78,8 @@ func queryOrderHis(userID string, role string) {
 			Data:  rsp.GetOrders(),
 		}
 		respB, _ := json.Marshal(resp)
-		logger.Info(respB)
-		conns[userID].WriteMessage(respB)
+	//	logger.Info(respB)
+		writeMessage(conns[userID], respB)
 	} else {
 		logger.Error(err.Error())
 	}
@@ -107,8 +113,8 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	conns[userID] = conn
 
 	wsConnCount++
-	// log.Infof("Current connection count: %d\n", wsConnCount) // not works
-	defultLog.Printf("Current connection count: %v\n", wsConnCount)
+	logger.Infof("Current connection count: %d\n", wsConnCount) // not works?
+	// defultLog.Printf("Current connection count: %v\n", wsConnCount)
 
 	// 启动协程，持续发信息
 	go func() {
@@ -118,14 +124,15 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		for {
 			select {
 			case <-ticker.C:
-				// log.Info(wsMsg)
+                                // logger.Infof("map len: %d %d\n", len(userInfos), len(subInfos))
 				if userInfos[userID] == nil {
 					continue
 				}
 				if userInfos[userID].Geo == (model.GeoLocation{}) || conn.IsClose() {
 					// ...
-				} else if subInfos[userID] != nil {
-					// fmt.Printf("%+v\n", subMsg)
+				}
+				if subInfos[userID] != nil {
+					// logger.Infof("tick task: %+v\n", subInfos)
 					queryGeoInfo(*subInfos[userID])
 					queryOrderHis(userID, roleStr)
 				}
@@ -176,10 +183,15 @@ func processSubscribeMessage(topic string, msg string) error {
 		if userInfos[uid] == nil {
 			continue
 		}
+		resp := MsgResponse{
+                        Topic: "orderreq",
+                        Data:  []byte(msg),
+                }
+		respB, _ := json.Marshal(resp)
 		if topic == config.DriverLbsMQTopic && userInfos[uid].Role == model.ClientDriver {
-			conn.WriteMessage([]byte(msg))
+			writeMessage(conn, respB)
 		} else if topic == config.PassengerLbsMQTopic && userInfos[uid].Role == model.ClientPassenger {
-			conn.WriteMessage([]byte(msg))
+			writeMessage(conn, respB)
 		}
 	}
 	return nil
