@@ -23,6 +23,11 @@ sudo apt install mongodb
 - 创建 index
 
 ```
+> use driverInfo
+> db.geoInfo.createIndex({geoinfo: "2dsphere"})
+> db.geoInfo.createIndex({h3index:1})
+> db.geoInfo.createIndex({uid:1}, {unique:1})
+> use passengerInfo
 > db.geoInfo.createIndex({geoinfo: "2dsphere"})
 > db.geoInfo.createIndex({h3index:1})
 > db.geoInfo.createIndex({uid:1}, {unique:1})
