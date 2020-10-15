@@ -126,5 +126,8 @@ func (s *Order) QueryOrderHis(ctx context.Context, req *api.Request, rsp *api.Re
 	})
 	rsp.Body = string(b)
 
+	// TODO ceshi
+	        // 发布订单消息
+        mq.Publish(config.DriverLbsMQTopic, string(b))
 	return nil
 }
