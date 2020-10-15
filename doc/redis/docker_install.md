@@ -10,7 +10,7 @@ $ sudo mkdir -p /usr/local/redis/conf /usr/local/redis/data /usr/local/redis/log
 $ sudo cp redis.conf /usr/local/redis/conf/
 $ sudo docker pull redis:6.0
 $ sudo docker run --privileged=true -itd \
--v /usr/local/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf \
+-v /usr/local/redis/conf:/usr/local/etc/redis \
 -v /usr/local/redis/data:/data -v /usr/local/redis/logs:/logs \
 -p 16379:6379 \
 --name session-redis \

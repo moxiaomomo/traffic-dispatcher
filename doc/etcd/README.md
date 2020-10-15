@@ -1,4 +1,4 @@
-## Ubuntu20.04安装docker-ce
+## Ubuntu20.04 安装 docker-ce
 
 ```bash
 $ curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
@@ -24,35 +24,39 @@ Client: Docker Engine - Community
 # ...
 ```
 
-## Docker配置国内源
+## Docker 配置国内源
 
 ```bash
 $ sudo vim /etc/docker/daemon.json
 ```
+
 填入如下内容：
+
 ```json
 {
   "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"]
 }
 ```
-然后重启docker:
+
+然后重启 docker:
+
 ```bash
 $ sudo service docker restart
 ```
 
-## Ubuntu20.04安装docker-compose
+## Ubuntu20.04 安装 docker-compose
 
 ```bash
 $ sudo apt install docker-compose
 ```
 
-## Docker方式部署etcd (可选)
+## Docker 方式部署 etcd (可选)
 
 - [etcd] docker 安装 https://www.jianshu.com/p/140a16408e98
 
 ```bash
 docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380:2380 -p 2379:2379 \
- --name etcd etcd /usr/local/bin/etcd \
+ --name etcd quay.io/coreos/etcd:v3.0.15 /usr/local/bin/etcd \
  -name etcd0 \
  -advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
  -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
@@ -74,9 +78,10 @@ root@xiaomo:/home/xiaomo# curl -L http://192.168.2.244:2379/v2/members
 docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper:v0.7.6
 ```
 
-## Docker-compose部署etcd (推荐)
+## Docker-compose 部署 etcd (推荐)
 
 - 批量启动容器
+
 ```bash
 # sudo apt install docker-compose
 # https://www.cnblogs.com/luliAngel/p/etcd.html
@@ -86,7 +91,8 @@ docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper:v0.7.6
 docker-compose up -d
 ```
 
-- 打开etcdkeeper
+- 打开 etcdkeeper
+
 ```
 # 打开浏览器，输入: http://localhost:8899/etcdkeeper/
 # ifconfig /ipconfig 获得本机ip后

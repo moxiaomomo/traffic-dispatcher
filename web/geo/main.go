@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"traffic-dispatcher/proto/lbs"
+	"traffic-dispatcher/proto/order"
 	"traffic-dispatcher/web/geo/handler"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ func main() {
 	}
 
 	handler.GeoCli = lbs.NewGeoLocationService("go.micro.srv.lbs", client.DefaultClient)
+	handler.OrderCli = order.NewOrderService("go.micro.srv.order", client.DefaultClient)
 
 	// Create RESTful handler (using Gin)
 	geoLoc := new(handler.GeoLocation)

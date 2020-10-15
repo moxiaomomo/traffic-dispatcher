@@ -4,6 +4,7 @@ import (
 	"traffic-dispatcher/model"
 	wsnet "traffic-dispatcher/net"
 	"traffic-dispatcher/proto/lbs"
+	"traffic-dispatcher/proto/order"
 )
 
 var (
@@ -11,6 +12,7 @@ var (
 	userInfos   map[string]*model.WSMessage
 	wsConnCount int
 	GeoCli      lbs.GeoLocationService
+	OrderCli    order.OrderService
 )
 
 type GeoLocation struct {

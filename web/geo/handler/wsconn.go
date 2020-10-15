@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	defultLog "log"
 	"time"
 
@@ -14,10 +15,17 @@ import (
 	"traffic-dispatcher/util"
 	"traffic-dispatcher/web/geo/mq"
 
+	orderProto "traffic-dispatcher/proto/order"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/micro/go-micro/v2/logger"
 )
+
+type MsgResponse struct {
+	Topic string      `json:"topic"`
+	Data  interface{} `json:"data"`
+}
 
 // 上报坐标位置
 func reportGeoInfo(cliRole model.ClientRole, data []byte) {
@@ -40,7 +48,32 @@ func queryGeoInfo(param model.WSMessage) {
 		Name: "QueryGeoInfo",
 		Data: data,
 	}); err == nil {
+		resp := MsgResponse{
+			Topic: "geolist",
+			Data:  string(rsp.GetData()),
+		}
+		fmt.Printf("resp: %+v\n", resp)
+		respB, _ := json.Marshal(resp)
+		fmt.Printf("respB: %+v\n", respB)
 		conns[param.User.UID].WriteMessage(rsp.GetData())
+	} else {
+		logger.Error(err.Error())
+	}
+}
+
+// 获取订单信息
+func queryOrderHis(userID string, role string) {
+	if rsp, err := OrderCli.QueryOrderHis(context.TODO(), &orderProto.ReqOrderHis{
+		UserId: userID,
+		Role:   int32(model.RoleValue(role)),
+	}); err == nil {
+		resp := MsgResponse{
+			Topic: "orderhis",
+			Data:  rsp.GetOrders(),
+		}
+		respB, _ := json.Marshal(resp)
+		logger.Info(respB)
+		conns[userID].WriteMessage(respB)
 	} else {
 		logger.Error(err.Error())
 	}
@@ -53,6 +86,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	var wsMsgByte []byte
 	var err error
 	var roleStr string
+	var userID string
 
 	// upgrade websocket
 	var wsConn *websocket.Conn
@@ -66,7 +100,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		return
 	}
 
-	userID := c.Query("uid")
+	userID = c.Query("uid")
 	if userID == "" {
 		logger.Info("invalid user id")
 		return
@@ -94,6 +128,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 				} else if subMsg.Command == model.CmdSubscribeGeo {
 					// fmt.Printf("%+v\n", subMsg)
 					queryGeoInfo(subMsg)
+					queryOrderHis(userID, roleStr)
 				}
 			}
 		}
@@ -101,6 +136,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 
 	// 根据用户角色订阅不同topic信息
 	roleStr = c.Query("role")
+	userID = c.Query("uid")
 	if model.IsDriver(roleStr) {
 		go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
 	} else if model.IsPassenger(roleStr) {

@@ -19,16 +19,25 @@ const (
 	ClientAdmin
 )
 
-func IsDriver(roleStr string) bool {
+func IsPassenger(roleStr string) bool {
 	if roleStr == "0" || strings.ToLower(roleStr) == "passenger" {
 		return true
 	}
 	return false
 }
 
-func IsPassenger(roleStr string) bool {
+func IsDriver(roleStr string) bool {
 	if roleStr == "1" || strings.ToLower(roleStr) == "driver" {
 		return true
 	}
 	return false
+}
+
+func RoleValue(roleStr string) ClientRole {
+	if roleStr == "0" || strings.ToLower(roleStr) == "passenger" {
+		return ClientPassenger
+	} else if roleStr == "1" || strings.ToLower(roleStr) == "driver" {
+		return ClientDriver
+	}
+	return ClientAdmin
 }

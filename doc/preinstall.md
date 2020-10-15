@@ -12,13 +12,16 @@
 
 ## mongodb
 
-- 安装mongodb
+- 安装 mongodb
+
 ```bash
 sudo apt install mongodb
 # MongoDB server version: 3.6.8
+# sudo yum install mongodb
 ```
 
-- 创建index
+- 创建 index
+
 ```
 > db.geoInfo.createIndex({geoinfo: "2dsphere"})
 > db.geoInfo.createIndex({h3index:1})
@@ -26,6 +29,7 @@ sudo apt install mongodb
 ```
 
 - 示例
+
 ```
 > db.geoInfo.find()
 { "_id" : ObjectId("5f38d6193f24b503fa68a35e"), "uid" : "testuid_0", "geoinfo" : { "type" : "Point", "coordinates" : [ 116.404, 39.915 ] }, "h3index" : "0x8731aa428ffffff", "name" : "testuser_0" }
@@ -38,4 +42,5 @@ sudo apt install mongodb
 ```bash
 sudo apt install redis-server
 # 5.0.7
+# yum install redis
 ```
