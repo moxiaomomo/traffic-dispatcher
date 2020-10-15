@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 	"traffic-dispatcher/api/driver/handler"
-	"traffic-dispatcher/api/driver/mq"
-	"traffic-dispatcher/config"
 	"traffic-dispatcher/proto/order"
 	user "traffic-dispatcher/proto/user"
 
@@ -43,7 +41,7 @@ func main() {
 	if err := broker.Connect(); err != nil {
 		log.Fatalf("broker.Connect() error:%v\n", err)
 	}
-	go mq.Subscribe(config.DriverLbsMQTopic)
+	// go mq.Subscribe(config.DriverLbsMQTopic)
 
 	if err := service.Run(); err != nil {
 		logger.Fatal(err)

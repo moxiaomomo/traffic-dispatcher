@@ -2,8 +2,6 @@ package main
 
 import (
 	"traffic-dispatcher/api/passenger/handler"
-	"traffic-dispatcher/api/passenger/mq"
-	"traffic-dispatcher/config"
 	lbs "traffic-dispatcher/proto/lbs"
 	order "traffic-dispatcher/proto/order"
 	user "traffic-dispatcher/proto/user"
@@ -55,7 +53,7 @@ func main() {
 	if err := broker.Connect(); err != nil {
 		logger.Fatalf("broker.Connect() error:%v\n", err)
 	}
-	go mq.Subscribe(config.PassengerLbsMQTopic)
+	// go mq.Subscribe(config.PassengerLbsMQTopic)
 
 	if err := service.Run(); err != nil {
 		logger.Fatal(err)

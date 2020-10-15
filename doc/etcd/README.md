@@ -71,7 +71,7 @@ root@xiaomo:/home/xiaomo# curl -L http://192.168.2.244:2379/v2/members
 - docker 安装 etcdkeeper (webUI)
 
 ```bash
-docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper
+docker run -it -d --name etcdkeeper -p 8899:8080 evildecay/etcdkeeper:v0.7.6
 ```
 
 ## Docker-compose部署etcd (推荐)

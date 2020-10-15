@@ -1,15 +1,14 @@
 package handler
 
 import (
+	"traffic-dispatcher/model"
 	wsnet "traffic-dispatcher/net"
 	"traffic-dispatcher/proto/lbs"
-
-	"github.com/gorilla/websocket"
 )
 
 var (
-	wsConn      *websocket.Conn
-	conn        *wsnet.WsConnection
+	conns       map[string]*wsnet.WsConnection
+	userInfos   map[string]*model.WSMessage
 	wsConnCount int
 	GeoCli      lbs.GeoLocationService
 )

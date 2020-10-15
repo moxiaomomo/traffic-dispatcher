@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"time"
+	"traffic-dispatcher/config"
 	"traffic-dispatcher/model"
 	order "traffic-dispatcher/proto/order"
+
+	"traffic-dispatcher/api/passenger/mq"
 
 	api "github.com/micro/go-micro/v2/api/proto"
 	"github.com/micro/go-micro/v2/errors"
@@ -42,6 +45,9 @@ func (s *Order) CreateOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 		"msg":   response.GetMessage(),
 	})
 	rsp.Body = string(b)
+
+	// 发布订单消息
+	mq.Publish(config.DriverLbsMQTopic, response.GetOrder().String())
 
 	return nil
 }
