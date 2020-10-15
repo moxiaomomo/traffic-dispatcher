@@ -6,17 +6,20 @@ import (
 	"fmt"
 	defultLog "log"
 	"time"
-	"traffic-dispatcher/util"
 
-	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/logger"
-
-	"traffic-dispatcher/api/driver/mq"
 	"traffic-dispatcher/config"
 	"traffic-dispatcher/model"
 	wsconn "traffic-dispatcher/net"
+	wsnet "traffic-dispatcher/net"
 	lbsProto "traffic-dispatcher/proto/lbs"
+	"traffic-dispatcher/util"
+	"traffic-dispatcher/web/geo/mq"
+
 	orderProto "traffic-dispatcher/proto/order"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"github.com/micro/go-micro/v2/logger"
 )
 
 type MsgResponse struct {
@@ -52,7 +55,7 @@ func queryGeoInfo(param model.WSMessage) {
 		fmt.Printf("resp: %+v\n", resp)
 		respB, _ := json.Marshal(resp)
 		fmt.Printf("respB: %+v\n", respB)
-		conn.WriteMessage(respB)
+		conns[param.User.UID].WriteMessage(rsp.GetData())
 	} else {
 		logger.Error(err.Error())
 	}
@@ -70,7 +73,7 @@ func queryOrderHis(userID string, role string) {
 		}
 		respB, _ := json.Marshal(resp)
 		logger.Info(respB)
-		conn.WriteMessage(respB)
+		conns[userID].WriteMessage(respB)
 	} else {
 		logger.Error(err.Error())
 	}
@@ -79,22 +82,30 @@ func queryOrderHis(userID string, role string) {
 // WSConnHandler websocket handler
 func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	// 搜索范围的中心位置坐标
-	var wsMsg model.WSMessage
-	var wsMsgByte []byte
 	var subMsg model.WSMessage
+	var wsMsgByte []byte
 	var err error
 	var roleStr string
 	var userID string
 
 	// upgrade websocket
+	var wsConn *websocket.Conn
 	if wsConn, err = wsconn.WsUpgrader.Upgrade(c.Writer, c.Request, nil); err != nil {
 		return
 	}
 	// initiate connection
+	var conn *wsnet.WsConnection
 	if conn, err = wsconn.InitConnection(wsConn); err != nil {
 		logger.Info(err.Error())
 		return
 	}
+
+	userID = c.Query("uid")
+	if userID == "" {
+		logger.Info("invalid user id")
+		return
+	}
+	conns[userID] = conn
 
 	wsConnCount++
 	// log.Infof("Current connection count: %d\n", wsConnCount) // not works
@@ -109,7 +120,10 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 			select {
 			case <-ticker.C:
 				// log.Info(wsMsg)
-				if wsMsg.Geo == (model.GeoLocation{}) || conn.IsClose() {
+				if userInfos[userID] == nil {
+					continue
+				}
+				if userInfos[userID].Geo == (model.GeoLocation{}) || conn.IsClose() {
 					// ...
 				} else if subMsg.Command == model.CmdSubscribeGeo {
 					// fmt.Printf("%+v\n", subMsg)
@@ -124,9 +138,9 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	roleStr = c.Query("role")
 	userID = c.Query("uid")
 	if model.IsDriver(roleStr) {
-		go mq.Subscribe(config.DriverLbsMQTopic)
+		go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
 	} else if model.IsPassenger(roleStr) {
-		go mq.Subscribe(config.PassengerLbsMQTopic)
+		go mq.Subscribe(config.PassengerLbsMQTopic, processSubscribeMessage)
 	}
 
 	for {
@@ -134,7 +148,9 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 			logger.Info(err.Error())
 			goto ERR
 		} else {
+			var wsMsg model.WSMessage
 			if err := json.Unmarshal(wsMsgByte, &wsMsg); err == nil {
+				userInfos[userID] = &wsMsg
 				if wsMsg.Command == model.CmdQueryGeo {
 					queryGeoInfo(wsMsg)
 				} else if wsMsg.Command == model.CmdReportGeo {
@@ -149,8 +165,22 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 ERR:
 	conn.Close()
 	logger.Info("===========connection closed===========")
-	wsMsg = model.WSMessage{}
+	subMsg = model.WSMessage{}
 	wsMsgByte = nil
 
 	wsConnCount--
+}
+
+func processSubscribeMessage(topic string, msg string) error {
+	for uid, conn := range conns {
+		if userInfos[uid] == nil {
+			continue
+		}
+		if topic == config.DriverLbsMQTopic && userInfos[uid].Role == model.ClientDriver {
+			conn.WriteMessage([]byte(msg))
+		} else if topic == config.PassengerLbsMQTopic && userInfos[uid].Role == model.ClientPassenger {
+			conn.WriteMessage([]byte(msg))
+		}
+	}
+	return nil
 }

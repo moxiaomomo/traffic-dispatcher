@@ -104,6 +104,8 @@ func (o *Order) FinishOrder(ctx context.Context, req *order.ReqFinishOrder, rsp 
 func (o *Order) QueryOrderHis(ctx context.Context, req *order.ReqOrderHis, rsp *order.RespOrderHis) error {
 	logger.Infof("Received QueryOrderHis request: %s\n", req.GetUserId())
 
+	rsp.Code = int32(config.StatusOK)
+
 	var dbOrders []orm.Order
 	var err error
 	if req.GetRole() == int32(model.ClientDriver) {
