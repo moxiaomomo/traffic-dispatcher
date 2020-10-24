@@ -1,6 +1,6 @@
 {
   "go.inferGopath": false,
-  "files.eol": "\n", // formatting only supports LF line endings
+  //   "files.eol": "\n", // formatting only supports LF line endings
   "go.goroot": "/usr/local/go",
   "go.gopath": "/data/go",
   "editor.fontSize": 16,
@@ -14,5 +14,18 @@
   "go.formatTool": "goimports",
   "go.autocompleteUnimportedPackages": true,
   "go.useCodeSnippetsOnFunctionSuggest": true,
-  "go.useCodeSnippetsOnFunctionSuggestWithoutType": true
+  "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+  "go.useLanguageServer": true,
+  "[go]": {
+    "editor.snippetSuggestions": "none",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "gopls": {
+    "usePlaceholders": true, // add parameter placeholders when completing a function
+    "completionDocumentation": true // for documentation in completion items
+  },
+  "files.eol": "\n" // formatting only supports LF line endings
 }

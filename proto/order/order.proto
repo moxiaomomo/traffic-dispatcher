@@ -5,19 +5,19 @@ option go_package = ".;order";
 
 service Order {
   // 创建出行订单
-  rpc CreateOrder(ReqCreateOrder) returns (RespCreateOrder) {}
+  rpc CreateOrder(ReqCreateOrder) returns(RespCreateOrder) {}
   // 接受订单 / 抢单
-  rpc AcceptOrder(ReqAcceptOrder) returns (RespAcceptOrder) {}
+  rpc AcceptOrder(ReqAcceptOrder) returns(RespAcceptOrder) {}
   // 订单确认上车
-  rpc ConfirmGetOn(ReqConfirmGetOn) returns (RespConfirmGetOn) {}
+  rpc ConfirmGetOn(ReqConfirmGetOn) returns(RespConfirmGetOn) {}
   // 订单行程开始
-  rpc StartOrder(ReqStartOrder) returns (RespStartOrder) {}
+  rpc StartOrder(ReqStartOrder) returns(RespStartOrder) {}
   // 订单行程取消
-  rpc CancelOrder(ReqCancelOrder) returns (RespCancelOrder) {}
+  rpc CancelOrder(ReqCancelOrder) returns(RespCancelOrder) {}
   // 订单行程完成
-  rpc FinishOrder(ReqFinishOrder) returns (RespFinishOrder) {}
+  rpc FinishOrder(ReqFinishOrder) returns(RespFinishOrder) {}
   // 查看订单行程历史
-  rpc QueryOrderHis(ReqOrderHis) returns (RespOrderHis) {}
+  rpc QueryOrderHis(ReqOrderHis) returns(RespOrderHis) {}
 }
 
 message order {
@@ -36,6 +36,8 @@ message order {
   string passengerId = 13;
   string driverId = 14;
   int32 status = 15;
+  string srcAddr = 16;
+  string destAddr = 17;
 }
 
 message ReqCreateOrder {

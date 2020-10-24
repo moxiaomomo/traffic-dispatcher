@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+
 	// defultLog "log"
 	"time"
 
@@ -28,8 +29,8 @@ type MsgResponse struct {
 }
 
 func Init() {
-        go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
-        go mq.Subscribe(config.PassengerLbsMQTopic, processSubscribeMessage)
+	go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
+	go mq.Subscribe(config.PassengerLbsMQTopic, processSubscribeMessage)
 }
 
 // 上报坐标位置
@@ -84,7 +85,7 @@ func queryOrderHis(userID string, role string) {
 			Data:  rsp.GetOrders(),
 		}
 		respB, _ := json.Marshal(resp)
-		logger.Info("%t %s", conns[userID]==nil, string(respB))
+		logger.Info("%t %s", conns[userID] == nil, string(respB))
 		writeMessage(conns[userID], respB)
 	} else {
 		logger.Error(err.Error())
@@ -130,7 +131,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		for {
 			select {
 			case <-ticker.C:
-                                // logger.Infof("map len: %d %d\n", len(userInfos), len(subInfos))
+				// logger.Infof("map len: %d %d\n", len(userInfos), len(subInfos))
 				if userInfos[userID] == nil {
 					continue
 				}
@@ -180,10 +181,30 @@ ERR:
 }
 
 func processSubscribeMessage(topic string, msg string) error {
+	var order orderProto.Order
+	err := json.Unmarshal([]byte(msg), &order)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	// geo parse
+	srcGeo := util.ParseGeoLocation(order.SrcGeo)
+	srcAddr, _ := geoCoder.ReverseGeocode(srcGeo.Lat, srcGeo.Lng)
+	if srcAddr != nil {
+		order.SrcAddr = srcAddr.FormattedAddress
+	}
+	destGeo := util.ParseGeoLocation(order.DestGeo)
+	destAddr, _ := geoCoder.ReverseGeocode(destGeo.Lat, destGeo.Lng)
+	if destAddr != nil {
+		order.DestAddr = destAddr.FormattedAddress
+	}
+
+	orderJSON, _ := json.Marshal(order)
 	resp := MsgResponse{
-                Topic: "orderreq",
-                Data:  []byte(msg),
-        }
+		Topic: "orderreq",
+		Data:  orderJSON,
+	}
 	// logger.Infof("on subscribe message: %+v\n", resp)
 	// logger.Infof("current conn map: %+v\n", userInfos)
 	respB, _ := json.Marshal(resp)
