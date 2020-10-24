@@ -46,9 +46,14 @@ func (s *Order) CreateOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 	})
 	rsp.Body = string(b)
 
-	// 发布订单消息
-	orderJSON, _ := json.Marshal(response.GetOrder())
-	mq.Publish(config.DriverLbsMQTopic, string(orderJSON))
+	if response.GetCode() == int32(config.StatusOK) {
+		// 发布订单消息
+		respOrder := response.GetOrder()
+		respOrder.SrcAddr = reqOrder.SrcAddr
+		respOrder.DestAddr = reqOrder.DestAddr
+		orderJSON, _ := json.Marshal(respOrder)
+		mq.Publish(config.DriverLbsMQTopic, string(orderJSON))
+	}
 
 	return nil
 }

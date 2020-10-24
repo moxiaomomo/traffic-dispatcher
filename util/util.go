@@ -116,9 +116,9 @@ func ParseGeoLocation(loc string) model.GeoLocation {
 	r := regexp.MustCompile(`\[(.*),(.*)\]`)
 	matches := r.FindStringSubmatch(loc)
 
-	if len(matches) == 2 {
-		res.Lng, _ = strconv.ParseFloat(matches[0], 64)
-		res.Lat, _ = strconv.ParseFloat(matches[1], 64)
+	if len(matches) == 3 {
+		res.Lng, _ = strconv.ParseFloat(matches[1], 64)
+		res.Lat, _ = strconv.ParseFloat(matches[2], 64)
 	}
 	return res
 }

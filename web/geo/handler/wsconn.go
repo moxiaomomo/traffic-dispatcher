@@ -85,7 +85,7 @@ func queryOrderHis(userID string, role string) {
 			Data:  rsp.GetOrders(),
 		}
 		respB, _ := json.Marshal(resp)
-		logger.Info("%t %s", conns[userID] == nil, string(respB))
+		// logger.Infof("%t %s", conns[userID] == nil, string(respB))
 		writeMessage(conns[userID], respB)
 	} else {
 		logger.Error(err.Error())
@@ -139,7 +139,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 					// ...
 				}
 				if subInfos[userID] != nil {
-					logger.Infof("tick task: %+v\n", subInfos)
+					// logger.Infof("tick task: %+v\n", subInfos)
 					queryGeoInfo(*subInfos[userID])
 					queryOrderHis(userID, roleStr)
 				}
@@ -188,24 +188,25 @@ func processSubscribeMessage(topic string, msg string) error {
 		return err
 	}
 
-	// geo parse
-	srcGeo := util.ParseGeoLocation(order.SrcGeo)
-	srcAddr, _ := geoCoder.ReverseGeocode(srcGeo.Lat, srcGeo.Lng)
-	if srcAddr != nil {
-		order.SrcAddr = srcAddr.FormattedAddress
-	}
-	destGeo := util.ParseGeoLocation(order.DestGeo)
-	destAddr, _ := geoCoder.ReverseGeocode(destGeo.Lat, destGeo.Lng)
-	if destAddr != nil {
-		order.DestAddr = destAddr.FormattedAddress
-	}
+//	// geo parse
+//	srcGeo := util.ParseGeoLocation(order.SrcGeo)
+//	srcAddr, _ := geoCoder.ReverseGeocode(srcGeo.Lat, srcGeo.Lng)
+//        logger.Infof("%+v %+v %+v\n", order.SrcGeo, srcGeo, srcAddr)
+//	if srcAddr != nil {
+//		order.SrcAddr = srcAddr.FormattedAddress
+//	}
+//	destGeo := util.ParseGeoLocation(order.DestGeo)
+//	destAddr, _ := geoCoder.ReverseGeocode(destGeo.Lat, destGeo.Lng)
+//	if destAddr != nil {
+//		order.DestAddr = destAddr.FormattedAddress
+//	}
 
 	orderJSON, _ := json.Marshal(order)
 	resp := MsgResponse{
 		Topic: "orderreq",
-		Data:  orderJSON,
+		Data:  string(orderJSON),
 	}
-	// logger.Infof("on subscribe message: %+v\n", resp)
+	logger.Infof("on subscribe message: %+v\n", resp)
 	// logger.Infof("current conn map: %+v\n", userInfos)
 	respB, _ := json.Marshal(resp)
 
@@ -215,7 +216,7 @@ func processSubscribeMessage(topic string, msg string) error {
 		}
 		logger.Infof("topic: %s, role: %d\n", topic, userInfos[uid].Role)
 		if topic == config.DriverLbsMQTopic && subInfos[uid].Role == model.ClientDriver {
-			// logger.Infof("%b, to send messageto driver", conn == nil)
+			logger.Infof("%b, to send messageto driver", conn == nil)
 			writeMessage(conn, respB)
 		} else if topic == config.PassengerLbsMQTopic && subInfos[uid].Role == model.ClientPassenger {
 			writeMessage(conn, respB)
