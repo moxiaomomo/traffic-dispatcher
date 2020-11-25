@@ -7,7 +7,7 @@ import (
 	"traffic-dispatcher/web/geo/handler"
 
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-micro/v2/web"
@@ -40,6 +40,7 @@ func main() {
 	if err := broker.Connect(); err != nil {
 		logger.Fatalf("broker.Connect() error:%v\n", err)
 	}
+	handler.Init()
 
 	// Run server
 	if err := service.Run(); err != nil {

@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+
 	// defultLog "log"
 	"time"
 
@@ -19,11 +20,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/micro/go-micro/v2/logger"
+	// "github.com/micro/go-micro/v2/broker"
 )
 
 type MsgResponse struct {
 	Topic string      `json:"topic"`
 	Data  interface{} `json:"data"`
+}
+
+func Init() {
+	go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
+	go mq.Subscribe(config.PassengerLbsMQTopic, processSubscribeMessage)
 }
 
 // 上报坐标位置
@@ -78,7 +85,7 @@ func queryOrderHis(userID string, role string) {
 			Data:  rsp.GetOrders(),
 		}
 		respB, _ := json.Marshal(resp)
-	//	logger.Info(respB)
+		// logger.Infof("%t %s", conns[userID] == nil, string(respB))
 		writeMessage(conns[userID], respB)
 	} else {
 		logger.Error(err.Error())
@@ -124,7 +131,7 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 		for {
 			select {
 			case <-ticker.C:
-                                // logger.Infof("map len: %d %d\n", len(userInfos), len(subInfos))
+				// logger.Infof("map len: %d %d\n", len(userInfos), len(subInfos))
 				if userInfos[userID] == nil {
 					continue
 				}
@@ -143,11 +150,6 @@ func (g *GeoLocation) WSConnHandler(c *gin.Context) {
 	// 根据用户角色订阅不同topic信息
 	roleStr = c.Query("role")
 	userID = c.Query("uid")
-	if model.IsDriver(roleStr) {
-		go mq.Subscribe(config.DriverLbsMQTopic, processSubscribeMessage)
-	} else if model.IsPassenger(roleStr) {
-		go mq.Subscribe(config.PassengerLbsMQTopic, processSubscribeMessage)
-	}
 
 	for {
 		if wsMsgByte, err = conn.ReadMessage(); err != nil {
@@ -179,18 +181,44 @@ ERR:
 }
 
 func processSubscribeMessage(topic string, msg string) error {
+	var order orderProto.Order
+	err := json.Unmarshal([]byte(msg), &order)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+//	// geo parse
+//	srcGeo := util.ParseGeoLocation(order.SrcGeo)
+//	srcAddr, _ := geoCoder.ReverseGeocode(srcGeo.Lat, srcGeo.Lng)
+//        logger.Infof("%+v %+v %+v\n", order.SrcGeo, srcGeo, srcAddr)
+//	if srcAddr != nil {
+//		order.SrcAddr = srcAddr.FormattedAddress
+//	}
+//	destGeo := util.ParseGeoLocation(order.DestGeo)
+//	destAddr, _ := geoCoder.ReverseGeocode(destGeo.Lat, destGeo.Lng)
+//	if destAddr != nil {
+//		order.DestAddr = destAddr.FormattedAddress
+//	}
+
+	orderJSON, _ := json.Marshal(order)
+	resp := MsgResponse{
+		Topic: "orderreq",
+		Data:  string(orderJSON),
+	}
+	logger.Infof("on subscribe message: %+v\n", resp)
+	// logger.Infof("current conn map: %+v\n", userInfos)
+	respB, _ := json.Marshal(resp)
+
 	for uid, conn := range conns {
 		if userInfos[uid] == nil {
 			continue
 		}
-		resp := MsgResponse{
-                        Topic: "orderreq",
-                        Data:  []byte(msg),
-                }
-		respB, _ := json.Marshal(resp)
-		if topic == config.DriverLbsMQTopic && userInfos[uid].Role == model.ClientDriver {
+		logger.Infof("topic: %s, role: %d\n", topic, userInfos[uid].Role)
+		if topic == config.DriverLbsMQTopic && subInfos[uid].Role == model.ClientDriver {
+			logger.Infof("%b, to send messageto driver", conn == nil)
 			writeMessage(conn, respB)
-		} else if topic == config.PassengerLbsMQTopic && userInfos[uid].Role == model.ClientPassenger {
+		} else if topic == config.PassengerLbsMQTopic && subInfos[uid].Role == model.ClientPassenger {
 			writeMessage(conn, respB)
 		}
 	}

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	"github.com/micro/go-micro/v2/logger"
 
 	user "traffic-dispatcher/proto/user"
@@ -26,21 +24,21 @@ func (s *Say2) Anything(c *gin.Context) {
 	})
 }
 
-func (s *Say2) Hello(c *gin.Context) {
-	logger.Info("Received Say.Hello API request")
+// func (s *Say2) Hello(c *gin.Context) {
+// 	logger.Info("Received Say.Hello API request")
 
-	name := c.Param("name")
+// 	name := c.Param("name")
 
-	response, err := cl2.QueryUserByName(context.TODO(), &user.Request{
-		UserName: name,
-	})
+// 	response, err := cl2.QueryUserByName(context.TODO(), &user.Request{
+// 		UserName: name,
+// 	})
 
-	if err != nil {
-		c.JSON(500, err)
-	}
+// 	if err != nil {
+// 		c.JSON(500, err)
+// 	}
 
-	c.JSON(200, response)
-}
+// 	c.JSON(200, response)
+// }
 
 func main() {
 	// Create service
@@ -57,7 +55,7 @@ func main() {
 	say := new(Say2)
 	router := gin.Default()
 	router.GET("/user", say.Anything)
-	router.GET("/user/:name", say.Hello)
+	// router.GET("/user/:name", say.Hello)
 
 	// Register Handler
 	service.Handle("/", router)

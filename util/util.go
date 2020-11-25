@@ -13,6 +13,10 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
+	"strconv"
+
+	"traffic-dispatcher/model"
 )
 
 type Sha1Stream struct {
@@ -104,4 +108,17 @@ func DeepCopyByGob(dst, src interface{}) error {
 	}
 
 	return gob.NewDecoder(&buffer).Decode(dst)
+}
+
+func ParseGeoLocation(loc string) model.GeoLocation {
+	var res model.GeoLocation
+
+	r := regexp.MustCompile(`\[(.*),(.*)\]`)
+	matches := r.FindStringSubmatch(loc)
+
+	if len(matches) == 3 {
+		res.Lng, _ = strconv.ParseFloat(matches[1], 64)
+		res.Lat, _ = strconv.ParseFloat(matches[2], 64)
+	}
+	return res
 }

@@ -46,8 +46,14 @@ func (s *Order) CreateOrder(ctx context.Context, req *api.Request, rsp *api.Resp
 	})
 	rsp.Body = string(b)
 
-	// 发布订单消息
-	mq.Publish(config.DriverLbsMQTopic, response.GetOrder().String())
+	if response.GetCode() == int32(config.StatusOK) {
+		// 发布订单消息
+		respOrder := response.GetOrder()
+		respOrder.SrcAddr = reqOrder.SrcAddr
+		respOrder.DestAddr = reqOrder.DestAddr
+		orderJSON, _ := json.Marshal(respOrder)
+		mq.Publish(config.DriverLbsMQTopic, string(orderJSON))
+	}
 
 	return nil
 }
@@ -126,5 +132,8 @@ func (s *Order) QueryOrderHis(ctx context.Context, req *api.Request, rsp *api.Re
 	})
 	rsp.Body = string(b)
 
+	// TODO ceshi
+	// 发布订单消息
+	mq.Publish(config.DriverLbsMQTopic, string(b))
 	return nil
 }
