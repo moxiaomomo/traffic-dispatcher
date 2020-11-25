@@ -12,6 +12,7 @@ import (
 	"github.com/micro/go-micro/v2/util/log"
 	h3 "github.com/uber/h3-go/v3"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -66,17 +67,16 @@ func QueryGeo(lat float64, lng float64, role model.ClientRole) (res []model.User
 	collection := dbCli.Database(clientDBMap[role]).Collection("geoInfo")
 
 	stages := mongo.Pipeline{}
-	getNearbyStage := bson.D{
-		{"$geoNear", bson.M{
-			"near": bson.M{
-				"type":        "Point",
-				"coordinates": []float64{lng, lat},
-			},
+	getNearbyStage := bson.D{primitive.E{
+		Key: "$geoNear",
+		Value: bson.M{
+			"near":          bson.M{"type": "Point", "coordinates": []float64{lng, lat}},
 			"maxDistance":   100000,
 			"spherical":     true,
 			"distanceField": "distance",
 			"query":         bson.M{"lat": bson.M{"$ne": ""}, "lng": bson.M{"$ne": ""}},
-		}}}
+		},
+	}}
 
 	stages = append(stages, getNearbyStage)
 
